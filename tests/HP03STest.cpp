@@ -63,6 +63,8 @@ TEST(HP03S_Init, Create)
 		->withIntParameters("parameter", SensorParameter_B);
 	mock_c()->expectOneCall("HP03S_ReadSensorParameter")
 		->withIntParameters("parameter", SensorParameter_C);
+	mock_c()->expectOneCall("HP03S_ReadSensorParameter")
+		->withIntParameters("parameter", SensorParameter_D);
 
 	HP03S_Create();
 
