@@ -8,7 +8,8 @@ typedef enum
 
 typedef enum
 {
-	dummycoefficient,
+	C1_SensitivityCoefficient,
+	C2_OffsetCoefficient,
 } SensorCoefficient;
 
 uint8_t read_sensor_parameter(SensorParameter param);

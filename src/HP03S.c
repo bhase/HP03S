@@ -3,7 +3,8 @@
 
 void HP03S_Create(void)
 {
-	HP03S_ReadSensorCoefficient(0);
+	HP03S_ReadSensorCoefficient(C1_SensitivityCoefficient);
+	HP03S_ReadSensorCoefficient(C2_OffsetCoefficient);
 }
 
 void HP03S_Destroy(void)

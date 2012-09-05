@@ -7,9 +7,9 @@ extern "C"
 #include "CppUTestExt/MockSupport_c.h"
 uint16_t FakeHP03S_ReadSensorCoefficient(SensorCoefficient coefficient)
 {
-	return (uint16_t)mock_c()->actualCall("HP03S_ReadSensorCoefficient")
-		->withIntParameters("coefficient", coefficient)
-		->returnValue().value.intValue;
+	mock_c()->actualCall("HP03S_ReadSensorCoefficient")
+		->withIntParameters("coefficient", coefficient);
+	return 0;
 }
 
 }
@@ -35,8 +35,9 @@ TEST_GROUP(HP03S_Init)
 TEST(HP03S_Init, Create)
 {
 	mock_c()->expectOneCall("HP03S_ReadSensorCoefficient")
-		->withIntParameters("coefficient", 0)
-		->andReturnIntValue(0);
+		->withIntParameters("coefficient", C1_SensitivityCoefficient);
+	mock_c()->expectOneCall("HP03S_ReadSensorCoefficient")
+		->withIntParameters("coefficient", C2_OffsetCoefficient);
 
 	HP03S_Create();
 
