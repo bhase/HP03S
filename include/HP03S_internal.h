@@ -12,6 +12,7 @@ typedef enum
 	C2_OffsetCoefficient,
 	C3_TemperatureCoefficientOfSensitivity,
 	C4_TemperatureCoefficientOfOffset,
+	C5_ReferenceTemperature,
 } SensorCoefficient;
 
 uint8_t read_sensor_parameter(SensorParameter param);
