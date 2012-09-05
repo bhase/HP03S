@@ -44,6 +44,8 @@ TEST(HP03S_Init, Create)
 		->withIntParameters("coefficient", C4_TemperatureCoefficientOfOffset);
 	mock_c()->expectOneCall("HP03S_ReadSensorCoefficient")
 		->withIntParameters("coefficient", C5_ReferenceTemperature);
+	mock_c()->expectOneCall("HP03S_ReadSensorCoefficient")
+		->withIntParameters("coefficient", C6_TemperatureCoefficientOfTemperature);
 
 	HP03S_Create();
 
