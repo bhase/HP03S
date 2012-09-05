@@ -1,6 +1,8 @@
 #ifndef D_HP03S_H
 #define D_HP03S_H
 
+#include <stdint.h>
+
 /**********************************************************
  *
  * HP03S is responsible for ...

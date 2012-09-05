@@ -7,6 +7,9 @@ COMPONENT_NAME = HP03S
 SILENCE = @
 
 #--- Inputs ----#
+
+CPPUTEST_USE_EXTENSIONS = Y
+
 PROJECT_HOME_DIR = .
 ifeq "$(CPPUTEST_HOME)" ""
     CPPUTEST_HOME = ../CppUTest
