@@ -3,7 +3,8 @@
 
 typedef enum
 {
-	dummyparam,
+	SensorParameter_A,
+	SensorParameter_B,
 } SensorParameter;
 
 typedef enum

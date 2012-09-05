@@ -58,7 +58,9 @@ TEST(HP03S_Init, Create)
 		->withIntParameters("coefficient", C7_OffsetFineTuning);
 
 	mock_c()->expectOneCall("HP03S_ReadSensorParameter")
-		->withIntParameters("parameter", 0);
+		->withIntParameters("parameter", SensorParameter_A);
+	mock_c()->expectOneCall("HP03S_ReadSensorParameter")
+		->withIntParameters("parameter", SensorParameter_B);
 
 	HP03S_Create();
 
