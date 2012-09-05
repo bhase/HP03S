@@ -6,6 +6,7 @@ void HP03S_Create(void)
 	HP03S_ReadSensorCoefficient(C1_SensitivityCoefficient);
 	HP03S_ReadSensorCoefficient(C2_OffsetCoefficient);
 	HP03S_ReadSensorCoefficient(C3_TemperatureCoefficientOfSensitivity);
+	HP03S_ReadSensorCoefficient(C4_TemperatureCoefficientOfOffset);
 }
 
 void HP03S_Destroy(void)
