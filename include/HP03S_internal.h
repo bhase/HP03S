@@ -5,6 +5,7 @@ typedef enum
 {
 	SensorParameter_A,
 	SensorParameter_B,
+	SensorParameter_C,
 } SensorParameter;
 
 typedef enum

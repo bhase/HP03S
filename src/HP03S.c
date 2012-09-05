@@ -13,6 +13,7 @@ void HP03S_Create(void)
 
 	HP03S_ReadSensorParameter(SensorParameter_A);
 	HP03S_ReadSensorParameter(SensorParameter_B);
+	HP03S_ReadSensorParameter(SensorParameter_C);
 }
 
 void HP03S_Destroy(void)
