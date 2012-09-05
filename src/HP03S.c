@@ -32,4 +32,5 @@ static uint16_t HP03S_ReadSensorCoefficientImpl(SensorCoefficient coefficient)
 	return 0;
 }
 
-uint16_t (*HP03S_ReadSensorCoefficient)(SensorCoefficient coefficient) = HP03S_ReadSensorCoefficientImpl;
+uint16_t (*HP03S_ReadSensorCoefficient)(SensorCoefficient coefficient) =
+	HP03S_ReadSensorCoefficientImpl;
