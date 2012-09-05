@@ -10,6 +10,8 @@ void HP03S_Create(void)
 	HP03S_ReadSensorCoefficient(C5_ReferenceTemperature);
 	HP03S_ReadSensorCoefficient(C6_TemperatureCoefficientOfTemperature);
 	HP03S_ReadSensorCoefficient(C7_OffsetFineTuning);
+
+	HP03S_ReadSensorParameter(0);
 }
 
 void HP03S_Destroy(void)
@@ -32,5 +34,13 @@ static uint16_t HP03S_ReadSensorCoefficientImpl(SensorCoefficient coefficient)
 	return 0;
 }
 
+static uint8_t HP03S_ReadSensorParameterImpl(SensorParameter parameter)
+{
+	return 0;
+}
+
 uint16_t (*HP03S_ReadSensorCoefficient)(SensorCoefficient coefficient) =
 	HP03S_ReadSensorCoefficientImpl;
+
+uint8_t (*HP03S_ReadSensorParameter)(SensorParameter parameter) =
+	HP03S_ReadSensorParameterImpl;

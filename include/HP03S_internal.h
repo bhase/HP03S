@@ -17,8 +17,9 @@ typedef enum
 	C7_OffsetFineTuning,
 } SensorCoefficient;
 
-uint8_t read_sensor_parameter(SensorParameter param);
+extern uint8_t (*HP03S_ReadSensorParameter)(SensorParameter param);
 extern uint16_t (*HP03S_ReadSensorCoefficient)(SensorCoefficient coefficient);
+
 uint16_t read_raw_pressure(void);
 uint16_t read_raw_temperature(void);
 

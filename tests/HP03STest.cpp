@@ -12,6 +12,13 @@ uint16_t FakeHP03S_ReadSensorCoefficient(SensorCoefficient coefficient)
 	return 0;
 }
 
+uint8_t FakeHP03S_ReadSensorParameter(SensorParameter parameter)
+{
+	mock_c()->actualCall("HP03S_ReadSensorParameter")
+		->withIntParameters("parameter", parameter);
+	return 0;
+}
+
 }
 
 #include "CppUTest/TestHarness.h"
@@ -24,6 +31,7 @@ TEST_GROUP(HP03S_Init)
 	void setup()
 	{
 		UT_PTR_SET(HP03S_ReadSensorCoefficient, FakeHP03S_ReadSensorCoefficient);
+		UT_PTR_SET(HP03S_ReadSensorParameter, FakeHP03S_ReadSensorParameter);
 	}
 
 	void teardown()
@@ -48,6 +56,9 @@ TEST(HP03S_Init, Create)
 		->withIntParameters("coefficient", C6_TemperatureCoefficientOfTemperature);
 	mock_c()->expectOneCall("HP03S_ReadSensorCoefficient")
 		->withIntParameters("coefficient", C7_OffsetFineTuning);
+
+	mock_c()->expectOneCall("HP03S_ReadSensorParameter")
+		->withIntParameters("parameter", 0);
 
 	HP03S_Create();
 
