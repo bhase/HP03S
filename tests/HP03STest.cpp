@@ -2,23 +2,9 @@ extern "C"
 {
 
 #include "HP03S.h"
-#include "HP03S_internal.h"
-#include <string.h>
+#include "mocks.h"
+
 #include "CppUTestExt/MockSupport_c.h"
-
-uint16_t MockHP03S_ReadSensorCoefficient(SensorCoefficient coefficient)
-{
-	mock_c()->actualCall("HP03S_ReadSensorCoefficient")
-		->withIntParameters("coefficient", coefficient);
-	return 0;
-}
-
-uint8_t MockHP03S_ReadSensorParameter(SensorParameter parameter)
-{
-	mock_c()->actualCall("HP03S_ReadSensorParameter")
-		->withIntParameters("parameter", parameter);
-	return 0;
-}
 
 }
 
@@ -31,8 +17,8 @@ TEST_GROUP(HP03S_Init)
 {
 	void setup()
 	{
-		UT_PTR_SET(HP03S_ReadSensorCoefficient, MockHP03S_ReadSensorCoefficient);
-		UT_PTR_SET(HP03S_ReadSensorParameter, MockHP03S_ReadSensorParameter);
+		UT_PTR_SET(HP03S_ReadSensorCoefficient, Mock_HP03S_ReadSensorCoefficient);
+		UT_PTR_SET(HP03S_ReadSensorParameter, Mock_HP03S_ReadSensorParameter);
 	}
 
 	void teardown()
@@ -72,22 +58,6 @@ TEST(HP03S_Init, Create)
 	mock_c()->checkExpectations();
 }
 
-
-extern "C"
-{
-uint16_t Mock_HP03S_ReadTemperature(void)
-{
-	mock_c()->actualCall("HP03S_ReadTemperature");
-	return 0;
-}
-
-uint16_t Mock_HP03S_ReadPressure(void)
-{
-	mock_c()->actualCall("HP03S_ReadPressure");
-	return 0;
-}
-
-}
 
 TEST_GROUP(HP03S_Application)
 {
