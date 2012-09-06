@@ -24,6 +24,9 @@ uint8_t MockHP03S_ReadSensorParameter(SensorParameter parameter)
 
 #include "CppUTest/TestHarness.h"
 
+/* Init should do a range check on parameter and coefficients */
+/* I2C error: device not responding */
+
 TEST_GROUP(HP03S_Init)
 {
 	void setup()
@@ -68,6 +71,7 @@ TEST(HP03S_Init, Create)
 
 	mock_c()->checkExpectations();
 }
+
 
 extern "C"
 {
@@ -162,19 +166,28 @@ TEST(HP03S_Application, Measure)
 	mock_c()->checkExpectations();
 }
 
-	/*  For testing I2C:
+/* replace the return values of ReadTemperature and ReadPressure */
+/* Replace the values of C1 - C7 and A - D */
+/* erroneous values? */
+/* device not responding */
+/* assure that XCLR is in the right state!
+ * - low in idle state
+ * - low while reading coefficients
+ * - high before starting AD conversion */
 
-	 Coefficient  EEPROM ADDRESS
-	 -----------  --------------
-	 C1(MSB:LSB)  (16:17)
-	 C2(MSB:LSB)  (18:19)
-	 C3(MSB:LSB)  (20:21)
-	 C4(MSB:LSB)  (22:23)
-	 C5(MSB:LSB)  (24:25)
-	 C6(MSB:LSB)  (26:27)
-	 C7(MSB:LSB)  (28:29)
-	 A            (30)
-	 B            (31)
-	 C            (32)
-	 D            (33)
-	 */
+/*  For testing I2C:
+
+    Coefficient  EEPROM ADDRESS
+    -----------  --------------
+    C1(MSB:LSB)  (16:17)
+    C2(MSB:LSB)  (18:19)
+    C3(MSB:LSB)  (20:21)
+    C4(MSB:LSB)  (22:23)
+    C5(MSB:LSB)  (24:25)
+    C6(MSB:LSB)  (26:27)
+    C7(MSB:LSB)  (28:29)
+    A            (30)
+    B            (31)
+    C            (32)
+    D            (33)
+    */
