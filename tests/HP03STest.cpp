@@ -69,16 +69,34 @@ TEST(HP03S_Init, Create)
 	mock_c()->checkExpectations();
 }
 
+extern "C"
+{
+uint16_t Mock_HP03S_ReadTemperature(void)
+{
+	mock_c()->actualCall("HP03S_ReadTemperature");
+	return 0;
+}
+
+uint16_t Mock_HP03S_ReadPressure(void)
+{
+	mock_c()->actualCall("HP03S_ReadPressure");
+	return 0;
+}
+
+}
 
 TEST_GROUP(HP03S_Application)
 {
 	void setup()
 	{
+		UT_PTR_SET(HP03S_ReadTemperature, Mock_HP03S_ReadTemperature);
+		UT_PTR_SET(HP03S_ReadPressure, Mock_HP03S_ReadPressure);
 		HP03S_Create();
 	}
 
 	void teardown()
 	{
+		mock_c()->clear();
 		HP03S_Destroy();
 	}
 };
@@ -132,6 +150,16 @@ TEST(HP03S_Application, GetPressure)
 {
 	/* we expect a pressure of 991,8 hPa */
 	CHECK(HP03S_GetPressure() == 9918);
+}
+
+TEST(HP03S_Application, Measure)
+{
+	mock_c()->expectOneCall("HP03S_ReadTemperature");
+	mock_c()->expectOneCall("HP03S_ReadPressure");
+
+	HP03S_Measure();
+
+	mock_c()->checkExpectations();
 }
 
 	/*  For testing I2C:

@@ -23,7 +23,7 @@ typedef enum
 extern uint8_t (*HP03S_ReadSensorParameter)(SensorParameter param);
 extern uint16_t (*HP03S_ReadSensorCoefficient)(SensorCoefficient coefficient);
 
-uint16_t read_raw_pressure(void);
-uint16_t read_raw_temperature(void);
+extern uint16_t (*HP03S_ReadTemperature)(void);
+extern uint16_t (*HP03S_ReadPressure)(void);
 
 #endif
