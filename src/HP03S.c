@@ -32,6 +32,7 @@ Pressure HP03S_GetPressure(void)
 	return 9918;
 }
 
+
 static uint16_t HP03S_ReadSensorCoefficientImpl(SensorCoefficient coefficient)
 {
 	return 0;

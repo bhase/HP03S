@@ -3,16 +3,17 @@ extern "C"
 
 #include "HP03S.h"
 #include "HP03S_internal.h"
-
+#include <string.h>
 #include "CppUTestExt/MockSupport_c.h"
-uint16_t FakeHP03S_ReadSensorCoefficient(SensorCoefficient coefficient)
+
+uint16_t MockHP03S_ReadSensorCoefficient(SensorCoefficient coefficient)
 {
 	mock_c()->actualCall("HP03S_ReadSensorCoefficient")
 		->withIntParameters("coefficient", coefficient);
 	return 0;
 }
 
-uint8_t FakeHP03S_ReadSensorParameter(SensorParameter parameter)
+uint8_t MockHP03S_ReadSensorParameter(SensorParameter parameter)
 {
 	mock_c()->actualCall("HP03S_ReadSensorParameter")
 		->withIntParameters("parameter", parameter);
@@ -22,16 +23,13 @@ uint8_t FakeHP03S_ReadSensorParameter(SensorParameter parameter)
 }
 
 #include "CppUTest/TestHarness.h"
-extern "C"
-{
-}
 
 TEST_GROUP(HP03S_Init)
 {
 	void setup()
 	{
-		UT_PTR_SET(HP03S_ReadSensorCoefficient, FakeHP03S_ReadSensorCoefficient);
-		UT_PTR_SET(HP03S_ReadSensorParameter, FakeHP03S_ReadSensorParameter);
+		UT_PTR_SET(HP03S_ReadSensorCoefficient, MockHP03S_ReadSensorCoefficient);
+		UT_PTR_SET(HP03S_ReadSensorParameter, MockHP03S_ReadSensorParameter);
 	}
 
 	void teardown()
@@ -69,26 +67,6 @@ TEST(HP03S_Init, Create)
 	HP03S_Create();
 
 	mock_c()->checkExpectations();
-	/* what should init do?
-	 * it can read all coefficients from i2c eeprom
-	 * - C1 to C7
-	 * - A, B, C, D (these names come from the data sheet)
-	 * and it should pull XCLR low while doing this
-
-	 Coefficient  EEPROM ADDRESS
-	 -----------  --------------
-	 C1(MSB:LSB)  (16:17)
-	 C2(MSB:LSB)  (18:19)
-	 C3(MSB:LSB)  (20:21)
-	 C4(MSB:LSB)  (22:23)
-	 C5(MSB:LSB)  (24:25)
-	 C6(MSB:LSB)  (26:27)
-	 C7(MSB:LSB)  (28:29)
-	 A            (30)
-	 B            (31)
-	 C            (32)
-	 D          (33)
-	 */
 }
 
 
@@ -155,3 +133,20 @@ TEST(HP03S_Application, GetPressure)
 	/* we expect a pressure of 991,8 hPa */
 	CHECK(HP03S_GetPressure() == 9918);
 }
+
+	/*  For testing I2C:
+
+	 Coefficient  EEPROM ADDRESS
+	 -----------  --------------
+	 C1(MSB:LSB)  (16:17)
+	 C2(MSB:LSB)  (18:19)
+	 C3(MSB:LSB)  (20:21)
+	 C4(MSB:LSB)  (22:23)
+	 C5(MSB:LSB)  (24:25)
+	 C6(MSB:LSB)  (26:27)
+	 C7(MSB:LSB)  (28:29)
+	 A            (30)
+	 B            (31)
+	 C            (32)
+	 D            (33)
+	 */
