@@ -161,3 +161,16 @@ TEST(HP03S_Application, Measure)
     C            (32)
     D            (33)
     */
+
+TEST_GROUP(HP03S_GPIO)
+{
+};
+
+TEST(HP03S_GPIO, Measure)
+{
+	/* sequence: XCLR high -> read AD -> read AD -> XCLR low */
+
+	/* expect that Measure() pulls XCLR high */
+	/* after measurement XCLR must be low */
+}
+
