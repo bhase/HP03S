@@ -1,6 +1,8 @@
 #ifndef HP03S_INTERNAL_H_
 #define HP03S_INTERNAL_H_
 
+#include <stdint.h>
+
 typedef enum
 {
 	SensorParameter_A,

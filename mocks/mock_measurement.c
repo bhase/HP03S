@@ -1,5 +1,3 @@
-#include <stdint.h>
-
 #include "mocks.h"
 #include "CppUTestExt/MockSupport_c.h"
 
