@@ -17,7 +17,7 @@ TEST_GROUP(MockGPIO)
     void setup()
     {
         fixture = new TestTestingFixture();
-	MockGPIO_Create(3);
+	MockGPIO_Create(4);
         expectedErrors = 1;
     }
 
@@ -55,4 +55,17 @@ TEST(MockGPIO, CanMatchExpectations)
 	expectedErrors = 0;
 	testFailureWith(CanMatchExpectations);
 	fixture->assertPrintContains("OK");
+}
+
+static void ReadWhenXCLRHighExpectedFails(void)
+{
+	MockGPIO_Expect_SetXCLR_High();
+
+	HP03S_ReadPressure();
+}
+
+TEST(MockGPIO, ReadWhenXCLRHighExpectedFails)
+{
+	testFailureWith(ReadWhenXCLRHighExpectedFails);
+	fixture->assertPrintContains("unexpected pressure read");
 }

@@ -4,12 +4,12 @@
 #include "GPIO.h"
 #include "HP03S_internal.h"
 
-void MockGPIO_Create(int maxExpectations);
+void MockGPIO_Create(unsigned int maxExpectations);
 void MockGPIO_Destroy(void);
 
 void MockGPIO_Expect_SetXCLR_High();
 void MockGPIO_Expect_SetXCLR_Low();
-void MockGPIO_Expect_nTimesADRead(int count);
+void MockGPIO_Expect_nTimesADRead(unsigned int count);
 
 void MockGPIO_CheckExpectations(void);
 
