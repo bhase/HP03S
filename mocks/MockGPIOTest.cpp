@@ -57,15 +57,28 @@ TEST(MockGPIO, CanMatchExpectations)
 	fixture->assertPrintContains("OK");
 }
 
-static void ReadWhenXCLRHighExpectedFails(void)
+static void ReadPressureWhenXCLRHighExpectedFails(void)
 {
 	MockGPIO_Expect_SetXCLR_High();
 
 	HP03S_ReadPressure();
 }
 
-TEST(MockGPIO, ReadWhenXCLRHighExpectedFails)
+TEST(MockGPIO, ReadPressureWhenXCLRHighExpectedFails)
 {
-	testFailureWith(ReadWhenXCLRHighExpectedFails);
+	testFailureWith(ReadPressureWhenXCLRHighExpectedFails);
 	fixture->assertPrintContains("unexpected pressure read");
+}
+
+static void ReadTemperatureWhenXCLRHighExpectedFails(void)
+{
+	MockGPIO_Expect_SetXCLR_High();
+
+	HP03S_ReadTemperature();
+}
+
+TEST(MockGPIO, ReadTemperatureWhenXCLRHighExpectedFails)
+{
+	testFailureWith(ReadTemperatureWhenXCLRHighExpectedFails);
+	fixture->assertPrintContains("unexpected temperature read");
 }

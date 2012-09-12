@@ -90,6 +90,8 @@ static uint16_t Mock_ReadPressure(void)
 
 static uint16_t Mock_ReadTemperature(void)
 {
+	if (expectations[checked_expectations].type != AD_READ)
+		fail("unexpected temperature read");
 	checked_expectations++;
 	return 0;
 }
