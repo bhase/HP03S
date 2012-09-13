@@ -82,3 +82,16 @@ TEST(MockGPIO, ReadTemperatureWhenXCLRHighExpectedFails)
 	testFailureWith(ReadTemperatureWhenXCLRHighExpectedFails);
 	fixture->assertPrintContains("unexpected temperature read");
 }
+
+static void XCLRLowWhenXCLRHighExpectedFails(void)
+{
+	MockGPIO_Expect_SetXCLR_High();
+
+	GPIO_SetXCLR_Low();
+}
+
+TEST(MockGPIO, XCLRLowWhenXCLRHighExpectedFails)
+{
+	testFailureWith(XCLRLowWhenXCLRHighExpectedFails);
+	fixture->assertPrintContains("unexpected XCLR low");
+}

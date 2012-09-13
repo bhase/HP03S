@@ -103,5 +103,7 @@ void GPIO_SetXCLR_High(void)
 
 void GPIO_SetXCLR_Low(void)
 {
+	if (expectations[checked_expectations].type != XCLR_LOW)
+		fail("unexpected XCLR low");
 	checked_expectations++;
 }
