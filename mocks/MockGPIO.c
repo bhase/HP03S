@@ -98,6 +98,8 @@ static uint16_t Mock_ReadTemperature(void)
 
 void GPIO_SetXCLR_High(void)
 {
+	if (expectations[checked_expectations].type != XCLR_HIGH)
+		fail("unexpected XCLR high");
 	checked_expectations++;
 }
 

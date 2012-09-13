@@ -95,3 +95,16 @@ TEST(MockGPIO, XCLRLowWhenXCLRHighExpectedFails)
 	testFailureWith(XCLRLowWhenXCLRHighExpectedFails);
 	fixture->assertPrintContains("unexpected XCLR low");
 }
+
+static void XCLRHighWhenLowExpectedFails(void)
+{
+	MockGPIO_Expect_SetXCLR_Low();
+
+	GPIO_SetXCLR_High();
+}
+
+TEST(MockGPIO, XCLRHighWhenLowExpectedFails)
+{
+	testFailureWith(XCLRHighWhenLowExpectedFails);
+	fixture->assertPrintContains("unexpected XCLR high");
+}
