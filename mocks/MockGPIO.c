@@ -88,6 +88,8 @@ void MockGPIO_Expect_nTimesADRead(unsigned int count)
 
 void MockGPIO_CheckExpectations(void)
 {
+	if (used_expectations < max_expectations)
+		fail("not all expectations used");
 }
 
 /*

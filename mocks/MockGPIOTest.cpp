@@ -123,3 +123,16 @@ TEST(MockGPIO, TooManyExpectations)
 	testFailureWith(TooManyExpectations);
 	fixture->assertPrintContains("too many expectations");
 }
+
+static void NotAllExpectationsUsed(void)
+{
+	MockGPIO_Expect_SetXCLR_Low();
+	MockGPIO_Expect_nTimesADRead(1);
+	MockGPIO_CheckExpectations();
+}
+
+TEST(MockGPIO, NotAllExpectationsUsed)
+{
+	testFailureWith(NotAllExpectationsUsed);
+	fixture->assertPrintContains("not all expectations used");
+}
