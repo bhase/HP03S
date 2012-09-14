@@ -22,6 +22,11 @@ typedef struct expectation
 
 static Expectation *expectations = NULL;
 
+static char *unexpected_pressure_read = "unexpected pressure read";
+static char *unexpected_temperature_read = "unexpected temperature read";
+static char *unexpected_xclr_high = "unexpected XCLR high";
+static char *unexpected_xclr_low = "unexpected XCLR low";
+
 static void fail(char *message)
 {
 	FAIL_TEXT_C(message);
@@ -83,7 +88,7 @@ void MockGPIO_CheckExpectations(void)
 static uint16_t Mock_ReadPressure(void)
 {
 	if (expectations[checked_expectations].type != AD_READ)
-		fail("unexpected pressure read");
+		fail(unexpected_pressure_read);
 	checked_expectations++;
 	return 0;
 }
@@ -91,7 +96,7 @@ static uint16_t Mock_ReadPressure(void)
 static uint16_t Mock_ReadTemperature(void)
 {
 	if (expectations[checked_expectations].type != AD_READ)
-		fail("unexpected temperature read");
+		fail(unexpected_temperature_read);
 	checked_expectations++;
 	return 0;
 }
@@ -99,13 +104,13 @@ static uint16_t Mock_ReadTemperature(void)
 void GPIO_SetXCLR_High(void)
 {
 	if (expectations[checked_expectations].type != XCLR_HIGH)
-		fail("unexpected XCLR high");
+		fail(unexpected_xclr_high);
 	checked_expectations++;
 }
 
 void GPIO_SetXCLR_Low(void)
 {
 	if (expectations[checked_expectations].type != XCLR_LOW)
-		fail("unexpected XCLR low");
+		fail(unexpected_xclr_low);
 	checked_expectations++;
 }
