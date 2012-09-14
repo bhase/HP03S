@@ -108,3 +108,18 @@ TEST(MockGPIO, XCLRHighWhenLowExpectedFails)
 	testFailureWith(XCLRHighWhenLowExpectedFails);
 	fixture->assertPrintContains("unexpected XCLR high");
 }
+
+static void TooManyExpectations(void)
+{
+	MockGPIO_Expect_SetXCLR_Low();
+	MockGPIO_Expect_nTimesADRead(1);
+	MockGPIO_Expect_SetXCLR_High();
+	MockGPIO_Expect_nTimesADRead(1);
+	MockGPIO_Expect_SetXCLR_Low();
+}
+
+TEST(MockGPIO, TooManyExpectations)
+{
+	testFailureWith(TooManyExpectations);
+	fixture->assertPrintContains("too many expectations");
+}

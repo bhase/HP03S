@@ -32,6 +32,12 @@ static void fail(char *message)
 	FAIL_TEXT_C(message);
 }
 
+static void failWhenNoRoomLeft(void)
+{
+	if (used_expectations >= max_expectations)
+		fail("too many expectations");
+}
+
 void MockGPIO_Create(unsigned int maxExpectations)
 {
 	saved_ReadPressure = HP03S_ReadPressure;
@@ -57,12 +63,14 @@ void MockGPIO_Destroy(void)
 
 void MockGPIO_Expect_SetXCLR_Low(void)
 {
+	failWhenNoRoomLeft();
 	expectations[used_expectations].type = XCLR_LOW;
 	used_expectations++;
 }
 
 void MockGPIO_Expect_SetXCLR_High(void)
 {
+	failWhenNoRoomLeft();
 	expectations[used_expectations].type = XCLR_HIGH;
 	used_expectations++;
 }
@@ -72,6 +80,7 @@ void MockGPIO_Expect_nTimesADRead(unsigned int count)
 	int i;
 	for (i = 0; i < count; i++)
 	{
+		failWhenNoRoomLeft();
 		expectations[used_expectations].type = AD_READ;
 		used_expectations++;
 	}
