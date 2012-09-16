@@ -148,3 +148,17 @@ TEST(MockGPIO, FailWhenNotInitialized)
 	testFailureWith(FailWhenNotInitialized);
 	fixture->assertPrintContains("uninitialized");
 }
+
+static void OkWithoutAllExpectations(void)
+{
+	MockGPIO_Expect_SetXCLR_Low();
+	GPIO_SetXCLR_Low();
+	MockGPIO_CheckExpectations();
+}
+
+TEST(MockGPIO, OkWithoutAllExpectations)
+{
+	expectedErrors = 0;
+	testFailureWith(OkWithoutAllExpectations);
+	fixture->assertPrintContains("OK");
+}
