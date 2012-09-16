@@ -136,3 +136,15 @@ TEST(MockGPIO, NotAllExpectationsUsed)
 	testFailureWith(NotAllExpectationsUsed);
 	fixture->assertPrintContains("not all expectations used");
 }
+
+static void FailWhenNotInitialized(void)
+{
+	MockGPIO_Destroy();
+	MockGPIO_Expect_SetXCLR_High();
+}
+
+TEST(MockGPIO, FailWhenNotInitialized)
+{
+	testFailureWith(FailWhenNotInitialized);
+	fixture->assertPrintContains("uninitialized");
+}

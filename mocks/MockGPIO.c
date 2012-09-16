@@ -32,11 +32,19 @@ static void fail(char *message)
 	FAIL_TEXT_C(message);
 }
 
+static void failWhenNotInitialized(void)
+{
+	if (expectations == NULL)
+		fail("do not use an uninitialized GPIO mock");
+}
+
 static void failWhenNoRoomLeft(void)
 {
+	failWhenNotInitialized();
 	if (used_expectations >= max_expectations)
 		fail("too many expectations");
 }
+
 
 void MockGPIO_Create(unsigned int maxExpectations)
 {
@@ -88,6 +96,7 @@ void MockGPIO_Expect_nTimesADRead(unsigned int count)
 
 void MockGPIO_CheckExpectations(void)
 {
+	failWhenNotInitialized();
 	if (used_expectations < max_expectations)
 		fail("not all expectations used");
 }
