@@ -2,11 +2,39 @@ extern "C"
 {
 
 #include "HP03S.h"
-#include "mocks.h"
+#include "HP03S_internal.h"
 
 #include "CppUTestExt/MockSupport_c.h"
 
+
+static uint16_t Mock_HP03S_ReadTemperature(void)
+{
+	mock_c()->actualCall("HP03S_ReadTemperature");
+	return 0;
 }
+
+static uint16_t Mock_HP03S_ReadPressure(void)
+{
+	mock_c()->actualCall("HP03S_ReadPressure");
+	return 0;
+}
+
+
+static uint16_t Mock_HP03S_ReadSensorCoefficient(SensorCoefficient coefficient)
+{
+	mock_c()->actualCall("HP03S_ReadSensorCoefficient")
+		->withIntParameters("coefficient", coefficient);
+	return 0;
+}
+
+static uint8_t Mock_HP03S_ReadSensorParameter(SensorParameter parameter)
+{
+	mock_c()->actualCall("HP03S_ReadSensorParameter")
+		->withIntParameters("parameter", parameter);
+	return 0;
+}
+
+} /* extern "C" */
 
 #include "CppUTest/TestHarness.h"
 
@@ -161,16 +189,3 @@ TEST(HP03S_Application, Measure)
     C            (32)
     D            (33)
     */
-
-TEST_GROUP(HP03S_GPIO)
-{
-};
-
-TEST(HP03S_GPIO, Measure)
-{
-	/* sequence: XCLR high -> read AD -> read AD -> XCLR low */
-
-	/* expect that Measure() pulls XCLR high */
-	/* after measurement XCLR must be low */
-}
-
