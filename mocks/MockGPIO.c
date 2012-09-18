@@ -102,7 +102,7 @@ void MockGPIO_CheckExpectations(void)
 }
 
 /*
- * mock the functions
+ * mock the functions to read AD values
  */
 
 static uint16_t Mock_ReadPressure(void)
@@ -121,8 +121,21 @@ static uint16_t Mock_ReadTemperature(void)
 	return 0;
 }
 
+
+/*       _\|/_
+         (o o)
+ +----oOO-{_}-OOo------------------------------------------------------+
+ |                                                                     |
+ | These are the only implementations of GPIO in the module.           |
+ | Since they may be called outside of a mock, they should             |
+ | not fail when not initialized.                                      |
+ |                                                                     |
+ +--------------------------------------------------------------------*/
+
 void GPIO_SetXCLR_High(void)
 {
+	if (expectations == NULL)
+		return;
 	if (expectations[checked_expectations].type != XCLR_HIGH)
 		fail(unexpected_xclr_high);
 	checked_expectations++;
@@ -130,6 +143,8 @@ void GPIO_SetXCLR_High(void)
 
 void GPIO_SetXCLR_Low(void)
 {
+	if (expectations == NULL)
+		return;
 	if (expectations[checked_expectations].type != XCLR_LOW)
 		fail(unexpected_xclr_low);
 	checked_expectations++;

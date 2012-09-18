@@ -162,3 +162,18 @@ TEST(MockGPIO, OkWithoutAllExpectations)
 	testFailureWith(OkWithoutAllExpectations);
 	fixture->assertPrintContains("OK");
 }
+
+static void GPIO_DoesNotFailWithoutInit(void)
+{
+	MockGPIO_Destroy();
+
+	GPIO_SetXCLR_Low();
+	GPIO_SetXCLR_High();
+}
+
+TEST(MockGPIO, GPIO_DoesNotFailWithoutInit)
+{
+	expectedErrors = 0;
+	testFailureWith(GPIO_DoesNotFailWithoutInit);
+	fixture->assertPrintContains("OK");
+}
