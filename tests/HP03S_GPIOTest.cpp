@@ -1,15 +1,34 @@
 
 #include "CppUTest/TestHarness.h"
 
+extern "C"
+{
+#include "HP03S.h"
+#include "MockGPIO.h"
+}
+
 TEST_GROUP(HP03S_GPIO)
 {
+	void setup(void)
+	{
+		MockGPIO_Create(4);
+	}
+
+	void teardown(void)
+	{
+		MockGPIO_CheckExpectations();
+		MockGPIO_Destroy();
+	}
 };
 
 TEST(HP03S_GPIO, Measure)
 {
 	/* sequence: XCLR high -> read AD -> read AD -> XCLR low */
+	MockGPIO_Expect_SetXCLR_High();
+	MockGPIO_Expect_nTimesADRead(2);
+	MockGPIO_Expect_SetXCLR_Low();
 
-	/* expect that Measure() pulls XCLR high */
-	/* after measurement XCLR must be low */
+	HP03S_Measure();
+
 }
 

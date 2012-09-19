@@ -1,5 +1,6 @@
 #include "HP03S.h"
 #include "HP03S_internal.h"
+#include "GPIO.h"
 
 void HP03S_Create(void)
 {
@@ -35,8 +36,10 @@ Pressure HP03S_GetPressure(void)
 
 void HP03S_Measure(void)
 {
+	GPIO_SetXCLR_High();
 	HP03S_ReadTemperature();
 	HP03S_ReadPressure();
+	GPIO_SetXCLR_Low();
 }
 
 
