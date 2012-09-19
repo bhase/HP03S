@@ -1,10 +1,16 @@
 #include "MockGPIO.h"
 #include "CppUTest/TestHarness_c.h"
+#include <stdio.h>
 
 static uint16_t Mock_ReadPressure(void);
 static uint16_t (*saved_ReadPressure)(void);
 static uint16_t Mock_ReadTemperature(void);
 static uint16_t (*saved_ReadTemperature)(void);
+
+static uint8_t (*saved_ReadSensorParameter)(SensorParameter param);
+static uint8_t Mock_ReadSensorParameter(SensorParameter param);
+static uint16_t (*saved_ReadSensorCoefficient)(SensorCoefficient coefficient);
+static uint16_t Mock_ReadSensorCoefficient(SensorCoefficient coefficient);
 
 static unsigned int used_expectations = 0;
 static unsigned int max_expectations = 0;
@@ -17,6 +23,7 @@ typedef struct expectation
 		XCLR_HIGH,
 		XCLR_LOW,
 		AD_READ,
+		EE_READ,
 	} type;
 } Expectation;
 
@@ -26,6 +33,8 @@ static char *unexpected_pressure_read = "unexpected pressure read";
 static char *unexpected_temperature_read = "unexpected temperature read";
 static char *unexpected_xclr_high = "unexpected XCLR high";
 static char *unexpected_xclr_low = "unexpected XCLR low";
+static char *unexpected_parameter_read = "unexpected parameter read";
+static char *unexpected_coefficient_read = "unexpected coefficient read";
 
 static void fail(char *message)
 {
@@ -54,7 +63,18 @@ void MockGPIO_Create(unsigned int maxExpectations)
 	HP03S_ReadPressure = Mock_ReadPressure;
 	HP03S_ReadTemperature = Mock_ReadTemperature;
 
+	saved_ReadSensorCoefficient = HP03S_ReadSensorCoefficient;
+	saved_ReadSensorParameter = HP03S_ReadSensorParameter;
+
+	HP03S_ReadSensorCoefficient = Mock_ReadSensorCoefficient;
+	HP03S_ReadSensorParameter = Mock_ReadSensorParameter;
+
 	expectations = calloc(maxExpectations, sizeof(Expectation));
+	if (expectations == NULL)
+	{
+		perror("calloc failed");
+		abort();
+	}
 	max_expectations = maxExpectations;
 	used_expectations = 0;
 	checked_expectations = 0;
@@ -64,6 +84,9 @@ void MockGPIO_Destroy(void)
 {
 	HP03S_ReadPressure = saved_ReadPressure;
 	HP03S_ReadTemperature = saved_ReadTemperature;
+
+	HP03S_ReadSensorParameter = saved_ReadSensorParameter;
+	HP03S_ReadSensorCoefficient = saved_ReadSensorCoefficient;
 
 	free(expectations);
 	expectations = NULL;
@@ -90,6 +113,17 @@ void MockGPIO_Expect_nTimesADRead(unsigned int count)
 	{
 		failWhenNoRoomLeft();
 		expectations[used_expectations].type = AD_READ;
+		used_expectations++;
+	}
+}
+
+void MockGPIO_Expect_nTimesEERead(unsigned int count)
+{
+	int i;
+	for (i = 0; i < count; i++)
+	{
+		failWhenNoRoomLeft();
+		expectations[used_expectations].type = EE_READ;
 		used_expectations++;
 	}
 }
@@ -121,6 +155,25 @@ static uint16_t Mock_ReadTemperature(void)
 	return 0;
 }
 
+/*
+ * mock the sensor parameter read functions
+ */
+
+static uint8_t Mock_ReadSensorParameter(SensorParameter param)
+{
+	if (expectations[checked_expectations].type != EE_READ)
+		fail(unexpected_parameter_read);
+	checked_expectations++;
+	return 0;
+}
+
+static uint16_t Mock_ReadSensorCoefficient(SensorCoefficient coefficient)
+{
+	if (expectations[checked_expectations].type != EE_READ)
+		fail(unexpected_coefficient_read);
+	checked_expectations++;
+	return 0;
+}
 
 /*       _\|/_
          (o o)

@@ -10,6 +10,7 @@ void MockGPIO_Destroy(void);
 void MockGPIO_Expect_SetXCLR_High();
 void MockGPIO_Expect_SetXCLR_Low();
 void MockGPIO_Expect_nTimesADRead(unsigned int count);
+void MockGPIO_Expect_nTimesEERead(unsigned int count);
 
 void MockGPIO_CheckExpectations(void);
 

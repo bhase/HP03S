@@ -17,7 +17,7 @@ TEST_GROUP(MockGPIO)
     void setup()
     {
         fixture = new TestTestingFixture();
-	MockGPIO_Create(4);
+	MockGPIO_Create(6);
         expectedErrors = 1;
     }
 
@@ -40,11 +40,14 @@ static void CanMatchExpectations(void)
 {
 	MockGPIO_Expect_SetXCLR_High();
 	MockGPIO_Expect_nTimesADRead(2);
+	MockGPIO_Expect_nTimesEERead(2);
 	MockGPIO_Expect_SetXCLR_Low();
 
 	GPIO_SetXCLR_High();
 	HP03S_ReadPressure();
 	HP03S_ReadTemperature();
+	HP03S_ReadSensorParameter(SensorParameter_A);
+	HP03S_ReadSensorCoefficient(C1_SensitivityCoefficient);
 	GPIO_SetXCLR_Low();
 
 	MockGPIO_CheckExpectations();
@@ -112,7 +115,8 @@ TEST(MockGPIO, XCLRHighWhenLowExpectedFails)
 static void TooManyExpectations(void)
 {
 	MockGPIO_Expect_SetXCLR_Low();
-	MockGPIO_Expect_nTimesADRead(1);
+	MockGPIO_Expect_nTimesADRead(2);
+	MockGPIO_Expect_nTimesEERead(2);
 	MockGPIO_Expect_SetXCLR_High();
 	MockGPIO_Expect_nTimesADRead(1);
 	MockGPIO_Expect_SetXCLR_Low();
@@ -176,4 +180,16 @@ TEST(MockGPIO, GPIO_DoesNotFailWithoutInit)
 	expectedErrors = 0;
 	testFailureWith(GPIO_DoesNotFailWithoutInit);
 	fixture->assertPrintContains("OK");
+}
+
+static void FailOnUnexpectedParameterRead(void)
+{
+	MockGPIO_Expect_SetXCLR_High();
+	HP03S_ReadSensorParameter(SensorParameter_A);
+}
+
+TEST(MockGPIO, FailOnUnexpectedParameterRead)
+{
+	testFailureWith(FailOnUnexpectedParameterRead);
+	fixture->assertPrintContains("unexpected parameter read");
 }
