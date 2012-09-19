@@ -4,6 +4,8 @@
 
 void HP03S_Create(void)
 {
+	GPIO_SetXCLR_Low();
+
 	HP03S_ReadSensorCoefficient(C1_SensitivityCoefficient);
 	HP03S_ReadSensorCoefficient(C2_OffsetCoefficient);
 	HP03S_ReadSensorCoefficient(C3_TemperatureCoefficientOfSensitivity);

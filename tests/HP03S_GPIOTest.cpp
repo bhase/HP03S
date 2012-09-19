@@ -11,7 +11,7 @@ TEST_GROUP(HP03S_GPIO)
 {
 	void setup(void)
 	{
-		MockGPIO_Create(4);
+		MockGPIO_Create(12);
 	}
 
 	void teardown(void)
@@ -32,3 +32,10 @@ TEST(HP03S_GPIO, Measure)
 
 }
 
+TEST(HP03S_GPIO, Init)
+{
+	MockGPIO_Expect_SetXCLR_Low();
+	MockGPIO_Expect_nTimesEERead(11);
+
+	HP03S_Create();
+}
