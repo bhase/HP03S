@@ -7,6 +7,11 @@ extern "C"
 #include "MockGPIO.h"
 }
 
+/* assure that XCLR is in the right state
+ * - low in idle state
+ * - low while reading coefficients
+ * - high before starting AD conversion */
+
 TEST_GROUP(HP03S_GPIO)
 {
 	void setup(void)
@@ -29,7 +34,6 @@ TEST(HP03S_GPIO, Measure)
 	MockGPIO_Expect_SetXCLR_Low();
 
 	HP03S_Measure();
-
 }
 
 TEST(HP03S_GPIO, Init)

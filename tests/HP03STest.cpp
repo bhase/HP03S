@@ -22,7 +22,7 @@ static uint16_t Mock_HP03S_ReadPressure(void)
 
 } /* extern "C" */
 
-TEST_GROUP(HP03S_Application)
+TEST_GROUP(HP03S)
 {
 	void setup()
 	{
@@ -78,19 +78,19 @@ P= 23738 * 10 /2^5 + 2500 = 9918 = 991.8hpa
 T= 250 + (-5478) * 3990 /2^16- (-5478/2^9) =-72 = -7.2°C
 */
 
-TEST(HP03S_Application, GetTemperature)
+TEST(HP03S, GetTemperature)
 {
 	/* we expect a temperature of -7,2 degree Celsius */
 	CHECK(HP03S_GetTemperature() == -72);
 }
 
-TEST(HP03S_Application, GetPressure)
+TEST(HP03S, GetPressure)
 {
 	/* we expect a pressure of 991,8 hPa */
 	CHECK(HP03S_GetPressure() == 9918);
 }
 
-TEST(HP03S_Application, Measure)
+TEST(HP03S, Measure)
 {
 	mock_c()->expectOneCall("HP03S_ReadTemperature");
 	mock_c()->expectOneCall("HP03S_ReadPressure");
@@ -102,10 +102,6 @@ TEST(HP03S_Application, Measure)
 /* Replace the values of C1 - C7 and A - D */
 /* erroneous values? */
 /* device not responding */
-/* assure that XCLR is in the right state!
- * - low in idle state
- * - low while reading coefficients
- * - high before starting AD conversion */
 
 /*  For testing I2C:
 
