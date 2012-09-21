@@ -2,39 +2,81 @@
 
 extern "C"
 {
-
 #include "HP03S.h"
 #include "HP03S_internal.h"
 
-#include "CppUTestExt/MockSupport_c.h"
+static uint16_t sensor_coefficients[7];
+static uint8_t sensor_parameters[4];
 
-static uint16_t Mock_HP03S_ReadTemperature(void)
+static uint16_t ad_temperature = 0;
+static uint16_t ad_pressure = 0;
+
+static uint16_t Mock_ReadPressure(void)
 {
-	mock_c()->actualCall("HP03S_ReadTemperature");
-	return 0;
+	return ad_pressure;
 }
 
-static uint16_t Mock_HP03S_ReadPressure(void)
+static uint16_t Mock_ReadTemperature(void)
 {
-	mock_c()->actualCall("HP03S_ReadPressure");
-	return 0;
+	return ad_temperature;
 }
 
-} /* extern "C" */
+static uint16_t Mock_ReadSensorCoefficient(SensorCoefficient coefficient)
+{
+	return sensor_coefficients[coefficient];
+}
+
+static uint8_t Mock_ReadSensorParameter(SensorParameter param)
+{
+	return sensor_parameters[param];
+}
+
+}
 
 TEST_GROUP(HP03S)
 {
+
+	void setup_default_coefficients(void)
+	{
+		sensor_coefficients[C1_SensitivityCoefficient] = 29908;
+		sensor_coefficients[C2_OffsetCoefficient] = 3724;
+		sensor_coefficients[C3_TemperatureCoefficientOfSensitivity] = 312;
+		sensor_coefficients[C4_TemperatureCoefficientOfOffset] = 441;
+		sensor_coefficients[C5_ReferenceTemperature] = 9191;
+		sensor_coefficients[C6_TemperatureCoefficientOfTemperature] = 3990;
+		sensor_coefficients[C7_OffsetFineTuning] = 2500;
+	}
+
+	void setup_default_parameter(void)
+	{
+		sensor_parameters[SensorParameter_A] = 1;
+		sensor_parameters[SensorParameter_B] = 4;
+		sensor_parameters[SensorParameter_C] = 4;
+		sensor_parameters[SensorParameter_D] = 9;
+	}
+
+	void setup_default_ad_values(void)
+	{
+		ad_temperature = 4107;
+		ad_pressure = 30036;
+	}
+
 	void setup()
 	{
-		UT_PTR_SET(HP03S_ReadTemperature, Mock_HP03S_ReadTemperature);
-		UT_PTR_SET(HP03S_ReadPressure, Mock_HP03S_ReadPressure);
+		setup_default_parameter();
+		setup_default_coefficients();
+		setup_default_ad_values();
+
+		UT_PTR_SET(HP03S_ReadSensorParameter, Mock_ReadSensorParameter);
+		UT_PTR_SET(HP03S_ReadSensorCoefficient, Mock_ReadSensorCoefficient);
+		UT_PTR_SET(HP03S_ReadPressure, Mock_ReadPressure);
+		UT_PTR_SET(HP03S_ReadTemperature, Mock_ReadTemperature);
+
 		HP03S_Create();
 	}
 
 	void teardown()
 	{
-		mock_c()->checkExpectations();
-		mock_c()->clear();
 		HP03S_Destroy();
 	}
 };
@@ -78,24 +120,41 @@ P= 23738 * 10 /2^5 + 2500 = 9918 = 991.8hpa
 T= 250 + (-5478) * 3990 /2^16- (-5478/2^9) =-72 = -7.2°C
 */
 
-TEST(HP03S, GetTemperature)
+/* Tests:
+ * C1 0x100, 0xFFFF
+ * C2 0x0, 0x1FFF
+ * C3 0x0, 0x400
+ * C4 0x0, 0x1000
+ * C5 0x1000, 0xFFFF
+ * C6 0x0, 0x4000
+ * C7 0x960, 0xA28
+ * A 0x1, 0x3F
+ * B 0x1, 0x3F
+ * C 0x1, 0xF
+ * D 0x1, 0xF
+ * pressure 0x0, 0xFFFF
+ * temperature 0x0, 0xFFFF
+ * All values like the data sheet example
+ */
+
+TEST(HP03S, DataSheetExample)
 {
+	HP03S_Measure();
 	/* we expect a temperature of -7,2 degree Celsius */
 	CHECK(HP03S_GetTemperature() == -72);
-}
-
-TEST(HP03S, GetPressure)
-{
 	/* we expect a pressure of 991,8 hPa */
 	CHECK(HP03S_GetPressure() == 9918);
 }
 
-TEST(HP03S, Measure)
+TEST(HP03S, TemperatureMin)
 {
-	mock_c()->expectOneCall("HP03S_ReadTemperature");
-	mock_c()->expectOneCall("HP03S_ReadPressure");
-
+	ad_temperature = 0;
 	HP03S_Measure();
+
+	/* TODO
+	CHECK(HP03S_GetTemperature() == 0);
+	CHECK(HP03S_GetPressure() == 0);
+	*/
 }
 
 /* replace the return values of ReadTemperature and ReadPressure */
