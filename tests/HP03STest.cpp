@@ -135,15 +135,18 @@ T= 250 + (-5478) * 3990 /2^16- (-5478/2^9) =-72 = -7.2°C
  * pressure 0x0, 0xFFFF
  * temperature 0x0, 0xFFFF
  * All values like the data sheet example
+ * some random combination
  */
 
 TEST(HP03S, DataSheetExample)
 {
 	HP03S_Measure();
-	/* we expect a temperature of -7,2 degree Celsius */
-	CHECK(HP03S_GetTemperature() == -72);
+	/* the data sheet calculation gives -7,2 degree as result
+	 * but if you truncate the intermediate result of the first division
+	 * like the compiler does you get -7,3 degree */
+	LONGS_EQUAL(-73, HP03S_GetTemperature());
 	/* we expect a pressure of 991,8 hPa */
-	CHECK(HP03S_GetPressure() == 9918);
+	LONGS_EQUAL(9918, HP03S_GetPressure());
 }
 
 TEST(HP03S, TemperatureMin)
@@ -151,10 +154,11 @@ TEST(HP03S, TemperatureMin)
 	ad_temperature = 0;
 	HP03S_Measure();
 
-	/* TODO
-	CHECK(HP03S_GetTemperature() == 0);
-	CHECK(HP03S_GetPressure() == 0);
-	*/
+	/* for an temperature ad value of 0 a temperature
+	 * of -36,7 degree Celsius is expected */
+	LONGS_EQUAL(-367, HP03S_GetTemperature());
+	/* pressure should be 903,1 hPa */
+	LONGS_EQUAL(9031, HP03S_GetPressure())
 }
 
 /* replace the return values of ReadTemperature and ReadPressure */
