@@ -52,9 +52,11 @@ void HP03S_Measure(void)
 	GPIO_SetXCLR_Low();
 
 	int temperature_distance  = measured_temperature - /* C5 */9191;
+	/* 64 bit is needed for high temperatures */
+	int64_t factor = measured_temperature < /* C5 */9191 ? /* B */4 : /* A */1;
 	int dUT = temperature_distance -
-		(temperature_distance * temperature_distance  * /* B */4) /
-		(16384 * (1 << /*C*/4));
+		(int)((temperature_distance * factor * temperature_distance) /
+		(16384 * (1 << /*C*/4)));
 	int OFF = 4 * /* C2 */3724 + (4 * (/* C4 */441 - 1024) * dUT) / 16384;
 	int SENS = /* C1 */29908 + (/* C3 */312 * dUT) / 1024;
 	int X = (SENS * (/* D1 */30036 - 7168)) / 16384 - OFF;
