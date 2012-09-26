@@ -149,6 +149,7 @@ TEST(HP03S, DataSheetExample)
 	LONGS_EQUAL(9918, HP03S_GetPressure());
 }
 
+
 TEST(HP03S, TemperatureMin)
 {
 	ad_temperature = 0;
@@ -178,6 +179,15 @@ TEST(HP03S, PressureMin)
 
 	LONGS_EQUAL(-73, HP03S_GetTemperature());
 	LONGS_EQUAL(-6259, HP03S_GetPressure())
+}
+
+TEST(HP03S, PressureMax)
+{
+	ad_pressure = 0xFFFF;
+	HP03S_Measure();
+
+	LONGS_EQUAL(-73, HP03S_GetTemperature());
+	LONGS_EQUAL(29038, HP03S_GetPressure())
 }
 
 /* replace the return values of ReadTemperature and ReadPressure */
