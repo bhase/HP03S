@@ -170,6 +170,16 @@ TEST(HP03S, TemperatureMax)
 	LONGS_EQUAL(18735, HP03S_GetPressure())
 }
 
+
+TEST(HP03S, PressureMin)
+{
+	ad_pressure = 0;
+	HP03S_Measure();
+
+	LONGS_EQUAL(-73, HP03S_GetTemperature());
+	LONGS_EQUAL(-6259, HP03S_GetPressure())
+}
+
 /* replace the return values of ReadTemperature and ReadPressure */
 /* Replace the values of C1 - C7 and A - D */
 /* erroneous values? */

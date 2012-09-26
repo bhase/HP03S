@@ -45,10 +45,11 @@ Pressure HP03S_GetPressure(void)
 void HP03S_Measure(void)
 {
 	uint16_t measured_temperature;
+	uint16_t measured_pressure;
 
 	GPIO_SetXCLR_High();
 	measured_temperature = HP03S_ReadTemperature();
-	HP03S_ReadPressure();
+	measured_pressure = HP03S_ReadPressure();
 	GPIO_SetXCLR_Low();
 
 	int temperature_distance  = measured_temperature - /* C5 */9191;
@@ -56,10 +57,10 @@ void HP03S_Measure(void)
 	int64_t factor = measured_temperature < /* C5 */9191 ? /* B */4 : /* A */1;
 	int dUT = temperature_distance -
 		(int)((temperature_distance * factor * temperature_distance) /
-		(16384 * (1 << /*C*/4)));
+		(16384l * (1 << /*C*/4)));
 	int OFF = 4 * /* C2 */3724 + (4 * (/* C4 */441 - 1024) * dUT) / 16384;
 	int SENS = /* C1 */29908 + (/* C3 */312 * dUT) / 1024;
-	int X = (SENS * (/* D1 */30036 - 7168)) / 16384 - OFF;
+	int X = (SENS * (measured_pressure - 7168)) / 16384 - OFF;
 
 	calculated.pressure = X * 10 / 32 + /* C7 */2500;
 	calculated.temperature = 250 + (dUT * /* C6 */3990) / 65536 - dUT / (1 << /*D*/9);
