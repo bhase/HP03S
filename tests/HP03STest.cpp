@@ -190,6 +190,69 @@ TEST(HP03S, PressureMax)
 	LONGS_EQUAL(29038, HP03S_GetPressure())
 }
 
+
+TEST_GROUP(HP03S_Coefficients)
+{
+
+	void setup_default_coefficients(void)
+	{
+		sensor_coefficients[C1_SensitivityCoefficient] = 29908;
+		sensor_coefficients[C2_OffsetCoefficient] = 3724;
+		sensor_coefficients[C3_TemperatureCoefficientOfSensitivity] = 312;
+		sensor_coefficients[C4_TemperatureCoefficientOfOffset] = 441;
+		sensor_coefficients[C5_ReferenceTemperature] = 9191;
+		sensor_coefficients[C6_TemperatureCoefficientOfTemperature] = 3990;
+		sensor_coefficients[C7_OffsetFineTuning] = 2500;
+	}
+
+	void setup_default_parameter(void)
+	{
+		sensor_parameters[SensorParameter_A] = 1;
+		sensor_parameters[SensorParameter_B] = 4;
+		sensor_parameters[SensorParameter_C] = 4;
+		sensor_parameters[SensorParameter_D] = 9;
+	}
+
+	void setup_default_ad_values(void)
+	{
+		ad_temperature = 4107;
+		ad_pressure = 30036;
+	}
+
+	void setup()
+	{
+		setup_default_parameter();
+		setup_default_coefficients();
+		setup_default_ad_values();
+
+		UT_PTR_SET(HP03S_ReadSensorParameter, Mock_ReadSensorParameter);
+		UT_PTR_SET(HP03S_ReadSensorCoefficient, Mock_ReadSensorCoefficient);
+		UT_PTR_SET(HP03S_ReadPressure, Mock_ReadPressure);
+		UT_PTR_SET(HP03S_ReadTemperature, Mock_ReadTemperature);
+	}
+
+	void teardown()
+	{
+		HP03S_Destroy();
+	}
+
+	void testWithCoefficient(SensorCoefficient c, uint16_t value)
+	{
+		sensor_coefficients[c] = value;
+		HP03S_Create();
+		HP03S_Measure();
+	}
+};
+
+
+TEST(HP03S_Coefficients, C1Min)
+{
+	testWithCoefficient(C1_SensitivityCoefficient, 0x100);
+
+	LONGS_EQUAL(-73, HP03S_GetTemperature());
+	LONGS_EQUAL(-3014, HP03S_GetPressure());
+}
+
 /* replace the return values of ReadTemperature and ReadPressure */
 /* Replace the values of C1 - C7 and A - D */
 /* erroneous values? */

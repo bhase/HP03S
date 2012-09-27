@@ -8,11 +8,16 @@ static struct
 	Pressure pressure;
 } calculated;
 
+static struct
+{
+	uint16_t C1;
+} sensor_coefficients;
+
 void HP03S_Create(void)
 {
 	GPIO_SetXCLR_Low();
 
-	HP03S_ReadSensorCoefficient(C1_SensitivityCoefficient);
+	sensor_coefficients.C1 = HP03S_ReadSensorCoefficient(C1_SensitivityCoefficient);
 	HP03S_ReadSensorCoefficient(C2_OffsetCoefficient);
 	HP03S_ReadSensorCoefficient(C3_TemperatureCoefficientOfSensitivity);
 	HP03S_ReadSensorCoefficient(C4_TemperatureCoefficientOfOffset);
@@ -59,7 +64,7 @@ void HP03S_Measure(void)
 		(int)((temperature_distance * factor * temperature_distance) /
 		(16384l * (1 << /*C*/4)));
 	int OFF = 4 * /* C2 */3724 + (4 * (/* C4 */441 - 1024) * dUT) / 16384;
-	int SENS = /* C1 */29908 + (/* C3 */312 * dUT) / 1024;
+	int SENS = sensor_coefficients.C1 + (/* C3 */312 * dUT) / 1024;
 	int X = (SENS * (measured_pressure - 7168)) / 16384 - OFF;
 
 	calculated.pressure = X * 10 / 32 + /* C7 */2500;
