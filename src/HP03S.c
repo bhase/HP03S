@@ -14,6 +14,7 @@ static struct
 	uint16_t C2;
 	uint16_t C3;
 	uint16_t C4;
+	uint16_t C5;
 } sensor_coefficients;
 
 void HP03S_Create(void)
@@ -24,7 +25,7 @@ void HP03S_Create(void)
 	sensor_coefficients.C2 = HP03S_ReadSensorCoefficient(C2_OffsetCoefficient);
 	sensor_coefficients.C3 = HP03S_ReadSensorCoefficient(C3_TemperatureCoefficientOfSensitivity);
 	sensor_coefficients.C4 = HP03S_ReadSensorCoefficient(C4_TemperatureCoefficientOfOffset);
-	HP03S_ReadSensorCoefficient(C5_ReferenceTemperature);
+	sensor_coefficients.C5 = HP03S_ReadSensorCoefficient(C5_ReferenceTemperature);
 	HP03S_ReadSensorCoefficient(C6_TemperatureCoefficientOfTemperature);
 	HP03S_ReadSensorCoefficient(C7_OffsetFineTuning);
 
@@ -60,9 +61,9 @@ void HP03S_Measure(void)
 	measured_pressure = HP03S_ReadPressure();
 	GPIO_SetXCLR_Low();
 
-	int temperature_distance  = measured_temperature - /* C5 */9191;
+	int temperature_distance  = measured_temperature - sensor_coefficients.C5;
 	/* 64 bit is needed for high temperatures */
-	int64_t factor = measured_temperature < /* C5 */9191 ? /* B */4 : /* A */1;
+	int64_t factor = measured_temperature < sensor_coefficients.C5 ? /* B */4 : /* A */1;
 	int dUT = temperature_distance -
 		(int)((temperature_distance * factor * temperature_distance) /
 		(16384l * (1 << /*C*/4)));
