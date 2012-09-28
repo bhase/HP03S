@@ -346,7 +346,15 @@ TEST(HP03S_Coefficients, C7Min)
 	testWithCoefficient(C7_OffsetFineTuning, 2400);
 
 	LONGS_EQUAL(-73, HP03S_GetTemperature());
-	LONGS_EQUAL(9918, HP03S_GetPressure());
+	LONGS_EQUAL(9818, HP03S_GetPressure());
+}
+
+TEST(HP03S_Coefficients, C7Max)
+{
+	testWithCoefficient(C7_OffsetFineTuning, 2600);
+
+	LONGS_EQUAL(-73, HP03S_GetTemperature());
+	LONGS_EQUAL(10018, HP03S_GetPressure());
 }
 
 /* replace the return values of ReadTemperature and ReadPressure */
