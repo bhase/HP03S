@@ -15,6 +15,7 @@ static struct
 	uint16_t C3;
 	uint16_t C4;
 	uint16_t C5;
+	uint16_t C6;
 } sensor_coefficients;
 
 void HP03S_Create(void)
@@ -26,7 +27,7 @@ void HP03S_Create(void)
 	sensor_coefficients.C3 = HP03S_ReadSensorCoefficient(C3_TemperatureCoefficientOfSensitivity);
 	sensor_coefficients.C4 = HP03S_ReadSensorCoefficient(C4_TemperatureCoefficientOfOffset);
 	sensor_coefficients.C5 = HP03S_ReadSensorCoefficient(C5_ReferenceTemperature);
-	HP03S_ReadSensorCoefficient(C6_TemperatureCoefficientOfTemperature);
+	sensor_coefficients.C6 = HP03S_ReadSensorCoefficient(C6_TemperatureCoefficientOfTemperature);
 	HP03S_ReadSensorCoefficient(C7_OffsetFineTuning);
 
 	HP03S_ReadSensorParameter(SensorParameter_A);
@@ -72,7 +73,7 @@ void HP03S_Measure(void)
 	int X = (SENS * (measured_pressure - 7168)) / 16384 - OFF;
 
 	calculated.pressure = X * 10 / 32 + /* C7 */2500;
-	calculated.temperature = 250 + (dUT * /* C6 */3990) / 65536 - dUT / (1 << /*D*/9);
+	calculated.temperature = 250 + (dUT * sensor_coefficients.C6) / 65536 - dUT / (1 << /*D*/9);
 }
 
 
