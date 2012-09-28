@@ -333,6 +333,14 @@ TEST(HP03S_Coefficients, C6Min)
 	LONGS_EQUAL(9918, HP03S_GetPressure());
 }
 
+TEST(HP03S_Coefficients, C6Max)
+{
+	testWithCoefficient(C6_TemperatureCoefficientOfTemperature, 0x4000);
+
+	LONGS_EQUAL(-1109, HP03S_GetTemperature());
+	LONGS_EQUAL(9918, HP03S_GetPressure());
+}
+
 /* replace the return values of ReadTemperature and ReadPressure */
 /* Replace the values of C1 - C7 and A - D */
 /* erroneous values? */
