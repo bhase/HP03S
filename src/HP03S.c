@@ -24,6 +24,7 @@ static struct
 	uint8_t A;
 	uint8_t B;
 	uint8_t C;
+	uint8_t D;
 } sensor_parameters;
 
 void HP03S_Create(void)
@@ -41,7 +42,7 @@ void HP03S_Create(void)
 	sensor_parameters.A = HP03S_ReadSensorParameter(SensorParameter_A);
 	sensor_parameters.B = HP03S_ReadSensorParameter(SensorParameter_B);
 	sensor_parameters.C = HP03S_ReadSensorParameter(SensorParameter_C);
-	HP03S_ReadSensorParameter(SensorParameter_D);
+	sensor_parameters.D = HP03S_ReadSensorParameter(SensorParameter_D);
 }
 
 void HP03S_Destroy(void)
@@ -81,7 +82,7 @@ void HP03S_Measure(void)
 	int X = (SENS * (measured_pressure - 7168)) / 16384 - OFF;
 
 	calculated.pressure = X * 10 / 32 + sensor_coefficients.C7;
-	calculated.temperature = 250 + (dUT * sensor_coefficients.C6) / 65536 - dUT / (1 << /*D*/9);
+	calculated.temperature = 250 + (dUT * sensor_coefficients.C6) / 65536 - dUT / (1 << sensor_parameters.D);
 }
 
 
