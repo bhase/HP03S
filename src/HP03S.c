@@ -23,6 +23,7 @@ static struct
 {
 	uint8_t A;
 	uint8_t B;
+	uint8_t C;
 } sensor_parameters;
 
 void HP03S_Create(void)
@@ -39,7 +40,7 @@ void HP03S_Create(void)
 
 	sensor_parameters.A = HP03S_ReadSensorParameter(SensorParameter_A);
 	sensor_parameters.B = HP03S_ReadSensorParameter(SensorParameter_B);
-	HP03S_ReadSensorParameter(SensorParameter_C);
+	sensor_parameters.C = HP03S_ReadSensorParameter(SensorParameter_C);
 	HP03S_ReadSensorParameter(SensorParameter_D);
 }
 
@@ -74,7 +75,7 @@ void HP03S_Measure(void)
 	int64_t factor = measured_temperature < sensor_coefficients.C5 ? sensor_parameters.B : sensor_parameters.A;
 	int dUT = temperature_distance -
 		(int)((temperature_distance * factor * temperature_distance) /
-		(16384l * (1 << /*C*/4)));
+		(16384l * (1 << sensor_parameters.C)));
 	int OFF = 4 * sensor_coefficients.C2 + (4 * (sensor_coefficients.C4 - 1024) * dUT) / 16384;
 	int SENS = sensor_coefficients.C1 + (sensor_coefficients.C3 * dUT) / 1024;
 	int X = (SENS * (measured_pressure - 7168)) / 16384 - OFF;
