@@ -22,7 +22,8 @@ static struct
 static struct
 {
 	uint8_t A;
-} sensor_paramters;
+	uint8_t B;
+} sensor_parameters;
 
 void HP03S_Create(void)
 {
@@ -36,8 +37,8 @@ void HP03S_Create(void)
 	sensor_coefficients.C6 = HP03S_ReadSensorCoefficient(C6_TemperatureCoefficientOfTemperature);
 	sensor_coefficients.C7 = HP03S_ReadSensorCoefficient(C7_OffsetFineTuning);
 
-	sensor_paramters.A = HP03S_ReadSensorParameter(SensorParameter_A);
-	HP03S_ReadSensorParameter(SensorParameter_B);
+	sensor_parameters.A = HP03S_ReadSensorParameter(SensorParameter_A);
+	sensor_parameters.B = HP03S_ReadSensorParameter(SensorParameter_B);
 	HP03S_ReadSensorParameter(SensorParameter_C);
 	HP03S_ReadSensorParameter(SensorParameter_D);
 }
@@ -70,7 +71,7 @@ void HP03S_Measure(void)
 
 	int temperature_distance  = measured_temperature - sensor_coefficients.C5;
 	/* 64 bit is needed for high temperatures */
-	int64_t factor = measured_temperature < sensor_coefficients.C5 ? /* B */4 : sensor_paramters.A;
+	int64_t factor = measured_temperature < sensor_coefficients.C5 ? sensor_parameters.B : sensor_parameters.A;
 	int dUT = temperature_distance -
 		(int)((temperature_distance * factor * temperature_distance) /
 		(16384l * (1 << /*C*/4)));
