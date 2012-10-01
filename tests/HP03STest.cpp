@@ -388,6 +388,14 @@ TEST(HP03S_Coefficients, BMin)
 	LONGS_EQUAL(9971, HP03S_GetPressure());
 }
 
+TEST(HP03S_Coefficients, BMax)
+{
+	testWithParameter(SensorParameter_B, 63);
+
+	LONGS_EQUAL(-415, HP03S_GetTemperature());
+	LONGS_EQUAL(8886, HP03S_GetPressure());
+}
+
 
 /* replace the return values of ReadTemperature and ReadPressure */
 /* Replace the values of C1 - C7 and A - D */
