@@ -242,6 +242,13 @@ TEST_GROUP(HP03S_Coefficients)
 		HP03S_Create();
 		HP03S_Measure();
 	}
+
+	void testWithParameter(SensorParameter p, uint8_t value)
+	{
+		sensor_parameters[p] = value;
+		HP03S_Create();
+		HP03S_Measure();
+	}
 };
 
 
@@ -356,6 +363,23 @@ TEST(HP03S_Coefficients, C7Max)
 	LONGS_EQUAL(-73, HP03S_GetTemperature());
 	LONGS_EQUAL(10018, HP03S_GetPressure());
 }
+
+TEST(HP03S_Coefficients, AMin)
+{
+	testWithParameter(SensorParameter_A, 1);
+
+	LONGS_EQUAL(-73, HP03S_GetTemperature());
+	LONGS_EQUAL(9918, HP03S_GetPressure());
+}
+
+TEST(HP03S_Coefficients, AMax)
+{
+	testWithParameter(SensorParameter_A, 0x3F);
+
+	LONGS_EQUAL(-73, HP03S_GetTemperature());
+	LONGS_EQUAL(9918, HP03S_GetPressure());
+}
+
 
 /* replace the return values of ReadTemperature and ReadPressure */
 /* Replace the values of C1 - C7 and A - D */
