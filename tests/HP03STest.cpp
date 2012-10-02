@@ -343,18 +343,22 @@ TEST(HP03S_Coefficients, C7Max)
 
 TEST(HP03S_Coefficients, AMin)
 {
+	/* to test A we need a higher temperature that it has influence */
+	ad_temperature = 12345;
 	testWithParameter(SensorParameter_A, 1);
 
-	LONGS_EQUAL(-73, HP03S_GetTemperature());
-	LONGS_EQUAL(9918, HP03S_GetPressure());
+	LONGS_EQUAL(433, HP03S_GetTemperature());
+	LONGS_EQUAL(11442, HP03S_GetPressure());
 }
 
 TEST(HP03S_Coefficients, AMax)
 {
+	/* to test A we need a higher temperature that it has influence */
+	ad_temperature = 12345;
 	testWithParameter(SensorParameter_A, 0x3F);
 
-	LONGS_EQUAL(-73, HP03S_GetTemperature());
-	LONGS_EQUAL(9918, HP03S_GetPressure());
+	LONGS_EQUAL(295, HP03S_GetTemperature());
+	LONGS_EQUAL(11024, HP03S_GetPressure());
 }
 
 TEST(HP03S_Coefficients, BMin)
