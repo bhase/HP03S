@@ -81,7 +81,8 @@ TEST_GROUP(HP03S)
 	}
 };
 
-/*
+/* This is the example from the data sheet
+
    Step 1: (get temperature value)
    a) D2 >= C5: dUT= D2-C5 - ((D2-C5)/2^7) * ((D2-C5)/2^7) * A / 2^C
    b) D2  < C5: dUT= D2-C5 - ((D2-C5)/2^7) * ((D2-C5)/2^7) * B / 2^C
@@ -120,24 +121,6 @@ P= 23738 * 10 /2^5 + 2500 = 9918 = 991.8hpa
 T= 250 + (-5478) * 3990 /2^16- (-5478/2^9) =-72 = -7.2°C
 */
 
-/* Tests:
- * C1 0x100, 0xFFFF
- * C2 0x0, 0x1FFF
- * C3 0x0, 0x400
- * C4 0x0, 0x1000
- * C5 0x1000, 0xFFFF
- * C6 0x0, 0x4000
- * C7 0x960, 0xA28
- * A 0x1, 0x3F
- * B 0x1, 0x3F
- * C 0x1, 0xF
- * D 0x1, 0xF
- * pressure 0x0, 0xFFFF
- * temperature 0x0, 0xFFFF
- * All values like the data sheet example
- * some random combination
- */
-
 TEST(HP03S, DataSheetExample)
 {
 	HP03S_Measure();
@@ -145,20 +128,15 @@ TEST(HP03S, DataSheetExample)
 	 * but if you truncate the intermediate result of the first division
 	 * like the compiler does you get -7,3 degree */
 	LONGS_EQUAL(-73, HP03S_GetTemperature());
-	/* we expect a pressure of 991,8 hPa */
 	LONGS_EQUAL(9918, HP03S_GetPressure());
 }
-
 
 TEST(HP03S, TemperatureMin)
 {
 	ad_temperature = 0;
 	HP03S_Measure();
 
-	/* for an temperature ad value of 0 a temperature
-	 * of -36,7 degree Celsius is expected */
 	LONGS_EQUAL(-367, HP03S_GetTemperature());
-	/* pressure should be 903,1 hPa */
 	LONGS_EQUAL(9031, HP03S_GetPressure())
 }
 
@@ -170,7 +148,6 @@ TEST(HP03S, TemperatureMax)
 	LONGS_EQUAL(2857, HP03S_GetTemperature());
 	LONGS_EQUAL(18735, HP03S_GetPressure())
 }
-
 
 TEST(HP03S, PressureMin)
 {
@@ -429,24 +406,7 @@ TEST(HP03S_Coefficients, DMax)
 }
 
 
-/* replace the return values of ReadTemperature and ReadPressure */
-/* Replace the values of C1 - C7 and A - D */
-/* erroneous values? */
-/* device not responding */
-
-/*  For testing I2C:
-
-    Coefficient  EEPROM ADDRESS
-    -----------  --------------
-    C1(MSB:LSB)  (16:17)
-    C2(MSB:LSB)  (18:19)
-    C3(MSB:LSB)  (20:21)
-    C4(MSB:LSB)  (22:23)
-    C5(MSB:LSB)  (24:25)
-    C6(MSB:LSB)  (26:27)
-    C7(MSB:LSB)  (28:29)
-    A            (30)
-    B            (31)
-    C            (32)
-    D            (33)
-    */
+/* Things to test
+ * erroneous values
+ * some random combination
+ * less random combination: highest values, lowest values */
