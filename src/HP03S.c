@@ -74,15 +74,15 @@ void HP03S_Measure(void)
 	int temperature_distance  = measured_temperature - sensor_coefficients.C5;
 	/* 64 bit is needed for high temperatures */
 	int64_t factor = measured_temperature < sensor_coefficients.C5 ? sensor_parameters.B : sensor_parameters.A;
-	int dUT = temperature_distance -
-		(int)((temperature_distance * factor * temperature_distance) /
+	int64_t dUT = temperature_distance -
+		((temperature_distance * factor * temperature_distance) /
 		(16384l * (1 << sensor_parameters.C)));
-	int OFF = 4 * sensor_coefficients.C2 + (4 * (sensor_coefficients.C4 - 1024) * dUT) / 16384;
-	int SENS = sensor_coefficients.C1 + (sensor_coefficients.C3 * dUT) / 1024;
-	int X = (SENS * (measured_pressure - 7168)) / 16384 - OFF;
+	int OFF = 4 * sensor_coefficients.C2 +(int)( (4 * (sensor_coefficients.C4 - 1024) * dUT) / 16384);
+	int SENS = sensor_coefficients.C1 + (int)((sensor_coefficients.C3 * dUT) / 1024);
+	int X = (int)((SENS * (int64_t)(measured_pressure - 7168)) / 16384) - OFF;
 
 	calculated.pressure = X * 10 / 32 + sensor_coefficients.C7;
-	calculated.temperature = 250 + (dUT * sensor_coefficients.C6) / 65536 - dUT / (1 << sensor_parameters.D);
+	calculated.temperature = 250 + (int)((dUT * sensor_coefficients.C6) / 65536) - (int)(dUT / (1 << sensor_parameters.D));
 }
 
 
