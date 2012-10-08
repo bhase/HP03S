@@ -435,7 +435,32 @@ TEST(HP03S_Coefficients, MaximumValues)
 	LONGS_EQUAL(-8497573, HP03S_GetPressure());
 }
 
+TEST(HP03S_Coefficients, MinimumValues)
+{
+	sensor_coefficients[C1_SensitivityCoefficient] = 256;
+	sensor_coefficients[C2_OffsetCoefficient] = 8191;
+	sensor_coefficients[C3_TemperatureCoefficientOfSensitivity] = 0;
+	sensor_coefficients[C4_TemperatureCoefficientOfOffset] = 4096;
+	sensor_coefficients[C5_ReferenceTemperature] = 65535;
+	sensor_coefficients[C6_TemperatureCoefficientOfTemperature] = 0;
+	sensor_coefficients[C7_OffsetFineTuning] = 2400;
+
+	sensor_parameters[SensorParameter_A] = 1; /* does not matter */
+	sensor_parameters[SensorParameter_B] = 1;
+	sensor_parameters[SensorParameter_C] = 15;
+	sensor_parameters[SensorParameter_D] = 15;
+
+	ad_temperature = 0;
+	ad_pressure = 0;
+
+	HP03S_Create();
+	HP03S_Measure();
+
+	LONGS_EQUAL(252, HP03S_GetTemperature());
+	LONGS_EQUAL(7487, HP03S_GetPressure());
+}
+
 /* Things to test
  * erroneous values
  * some random combination
- * less random combination: highest values, lowest values */
+ */
