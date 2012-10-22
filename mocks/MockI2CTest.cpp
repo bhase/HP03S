@@ -50,7 +50,7 @@ static void CanMatchExpectations(void)
 
 	I2C_ReadFrom(device_address, 1, buffer);
 	I2C_WriteTo(device_address, 2, buffer);
-	I2C_Run();
+	LONGS_EQUAL(I2C_Run(), I2C_Ok);
 }
 
 TEST(MockI2C, CanMatchExpectations)
