@@ -60,6 +60,19 @@ TEST(MockI2C, CanMatchExpectations)
 	fixture->assertPrintContains("OK");
 }
 
+static void WriteWhenReadExpectedFails(void)
+{
+	MockI2C_Expect_I2C_ReadFrom_and_fill_buffer(device_address, 1, buffer);
+
+	I2C_WriteTo(device_address, 1, buffer);
+}
+
+TEST(MockI2C, WriteWhenReadExpectedFails)
+{
+	testFailureWith(WriteWhenReadExpectedFails);
+	fixture->assertPrintContains("unexpected write");
+}
+
 /* what could go wrong?
  * - read if write expected
  * - write if read expected
