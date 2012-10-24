@@ -9,7 +9,7 @@
 
 #include "I2C.h"
 
-void MockI2C_Create(int size);
+void MockI2C_Create(size_t size);
 void MockI2C_Destroy(void);
 
 void MockI2C_Expect_I2C_ReadFrom_and_fill_buffer(uint16_t device_address, uint8_t len, uint8_t *fillContents);

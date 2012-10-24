@@ -1,27 +1,38 @@
 #include "MockI2C.h"
 #include "CppUTest/TestHarness_c.h"
 
-static uint8_t write_expected = 0;
-static uint8_t read_expected = 0;
+typedef struct {
+	enum {
+		I2C_READ,
+		I2C_WRITE,
+	} expectation_type;
+} Expectation;
 
-void MockI2C_Create(int size)
+static Expectation *expectations = NULL;
+static int currently_used_expectation = 0;
+static int currently_recorded_expectation = 0;
+
+void MockI2C_Create(size_t size)
 {
-	write_expected = 0;
-	read_expected = 0;
+	currently_used_expectation = 0;
+	currently_recorded_expectation = 0;
+	expectations = malloc(sizeof(Expectation) * size);
 }
 
 void MockI2C_Destroy(void)
 {
+	free(expectations);
+	expectations = NULL;
 }
 
 void MockI2C_Expect_I2C_ReadFrom_and_fill_buffer(uint16_t device_address, uint8_t len, uint8_t *buffer)
 {
-	read_expected++;
+	expectations[currently_recorded_expectation++].expectation_type = I2C_READ;
 }
 
 void MockI2C_Expect_I2C_WriteTo_and_check_buffer(uint16_t device_address, uint8_t len, const uint8_t *buffer)
 {
-	write_expected++;
+	expectations[currently_recorded_expectation++].expectation_type = I2C_WRITE;
 }
 
 void MockI2C_Expect_I2C_Run_and_return(I2C_Result result)
@@ -32,21 +43,15 @@ void MockI2C_Expect_I2C_Run_and_return(I2C_Result result)
 
 void I2C_ReadFrom(uint16_t device_address, uint8_t length, uint8_t *buffer)
 {
-	if (!read_expected) {
+	if (expectations[currently_used_expectation++].expectation_type != I2C_READ) {
 		FAIL_TEXT_C("unexpected read");
-	}
-	else {
-		read_expected--;
 	}
 }
 
 void I2C_WriteTo(uint16_t device_address, uint8_t length, uint8_t *buffer)
 {
-	if (!write_expected) {
+	if (expectations[currently_used_expectation++].expectation_type != I2C_WRITE) {
 		FAIL_TEXT_C("unexpected write");
-	}
-	else {
-		write_expected--;
 	}
 }
 
