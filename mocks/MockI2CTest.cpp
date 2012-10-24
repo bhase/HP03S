@@ -51,6 +51,8 @@ static void CanMatchExpectations(void)
 	I2C_ReadFrom(device_address, 1, buffer);
 	I2C_WriteTo(device_address, 2, buffer);
 	LONGS_EQUAL(I2C_Run(), I2C_Ok);
+
+	MockI2C_CheckExpectations();
 }
 
 TEST(MockI2C, CanMatchExpectations)
@@ -141,6 +143,22 @@ TEST(MockI2C, TooManyExpectations)
 {
 	testFailureWith(TooManyExpectations);
 	fixture->assertPrintContains("too many expectations");
+}
+
+static void NotAllExpectationsUsed(void)
+{
+	MockI2C_Expect_I2C_WriteTo_and_check_buffer(device_address, 1, buffer);
+	MockI2C_Expect_I2C_Run_and_return(I2C_Ok);
+
+	I2C_Run();
+
+	MockI2C_CheckExpectations();
+}
+
+TEST(MockI2C, NotAllExpectationsUsed)
+{
+	testFailureWith(NotAllExpectationsUsed);
+	fixture->assertPrintContains("unused expectations");
 }
 
 /* what could go wrong?

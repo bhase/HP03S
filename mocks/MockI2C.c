@@ -9,14 +9,14 @@ typedef struct {
 } Expectation;
 
 static Expectation *expectations = NULL;
-static int currently_used_expectation = 0;
-static int currently_recorded_expectation = 0;
+static int last_used_expectation = 0;
+static int last_recorded_expectation = 0;
 static size_t max_expectations = 0;
 
 void MockI2C_Create(size_t size)
 {
-	currently_used_expectation = 0;
-	currently_recorded_expectation = 0;
+	last_used_expectation = 0;
+	last_recorded_expectation = 0;
 	expectations = malloc(sizeof(Expectation) * size);
 	max_expectations = size;
 }
@@ -30,36 +30,43 @@ void MockI2C_Destroy(void)
 
 void MockI2C_Expect_I2C_ReadFrom_and_fill_buffer(uint16_t device_address, uint8_t len, uint8_t *buffer)
 {
-	if (currently_recorded_expectation >= max_expectations) {
+	if (last_recorded_expectation >= max_expectations) {
 		FAIL_TEXT_C("too many expectations");
 	}
-	expectations[currently_recorded_expectation++].expectation_type = I2C_READ;
+	expectations[last_recorded_expectation++].expectation_type = I2C_READ;
 }
 
 void MockI2C_Expect_I2C_WriteTo_and_check_buffer(uint16_t device_address, uint8_t len, const uint8_t *buffer)
 {
-	if (currently_recorded_expectation >= max_expectations) {
+	if (last_recorded_expectation >= max_expectations) {
 		FAIL_TEXT_C("too many expectations");
 	}
-	expectations[currently_recorded_expectation++].expectation_type = I2C_WRITE;
+	expectations[last_recorded_expectation++].expectation_type = I2C_WRITE;
 }
 
 void MockI2C_Expect_I2C_Run_and_return(I2C_Result result)
 {
 }
 
+void MockI2C_CheckExpectations(void)
+{
+	if (last_used_expectation < last_recorded_expectation) {
+		FAIL_TEXT_C("there are unused expectations");
+	}
+}
+
 /* I2C dummy implementation */
 
 void I2C_ReadFrom(uint16_t device_address, uint8_t length, uint8_t *buffer)
 {
-	if (expectations[currently_used_expectation++].expectation_type != I2C_READ) {
+	if (expectations[last_used_expectation++].expectation_type != I2C_READ) {
 		FAIL_TEXT_C("unexpected read");
 	}
 }
 
 void I2C_WriteTo(uint16_t device_address, uint8_t length, uint8_t *buffer)
 {
-	if (expectations[currently_used_expectation++].expectation_type != I2C_WRITE) {
+	if (expectations[last_used_expectation++].expectation_type != I2C_WRITE) {
 		FAIL_TEXT_C("unexpected write");
 	}
 }
