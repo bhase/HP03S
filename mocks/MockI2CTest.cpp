@@ -86,6 +86,20 @@ TEST(MockI2C, ReadWhenWriteExpectedFails)
 	fixture->assertPrintContains("unexpected read");
 }
 
+static void TooManyRead(void)
+{
+	MockI2C_Expect_I2C_ReadFrom_and_fill_buffer(device_address, 1, buffer);
+
+	I2C_ReadFrom(device_address, 1, buffer);
+	I2C_ReadFrom(device_address, 1, buffer);
+}
+
+TEST(MockI2C, TooManyRead)
+{
+	testFailureWith(TooManyRead);
+	fixture->assertPrintContains("unexpected read");
+}
+
 /* what could go wrong?
  * - too many read
  * - too many write
