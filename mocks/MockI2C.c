@@ -21,7 +21,7 @@ void MockI2C_Expect_I2C_ReadFrom_and_fill_buffer(uint16_t device_address, uint8_
 
 void MockI2C_Expect_I2C_WriteTo_and_check_buffer(uint16_t device_address, uint8_t len, const uint8_t *buffer)
 {
-	write_expected = 1;
+	write_expected++;
 }
 
 void MockI2C_Expect_I2C_Run_and_return(I2C_Result result)
@@ -44,6 +44,9 @@ void I2C_WriteTo(uint16_t device_address, uint8_t length, uint8_t *buffer)
 {
 	if (!write_expected) {
 		FAIL_TEXT_C("unexpected write");
+	}
+	else {
+		write_expected--;
 	}
 }
 
