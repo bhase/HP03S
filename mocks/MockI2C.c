@@ -11,27 +11,36 @@ typedef struct {
 static Expectation *expectations = NULL;
 static int currently_used_expectation = 0;
 static int currently_recorded_expectation = 0;
+static size_t max_expectations = 0;
 
 void MockI2C_Create(size_t size)
 {
 	currently_used_expectation = 0;
 	currently_recorded_expectation = 0;
 	expectations = malloc(sizeof(Expectation) * size);
+	max_expectations = size;
 }
 
 void MockI2C_Destroy(void)
 {
 	free(expectations);
 	expectations = NULL;
+	max_expectations = 0;
 }
 
 void MockI2C_Expect_I2C_ReadFrom_and_fill_buffer(uint16_t device_address, uint8_t len, uint8_t *buffer)
 {
+	if (currently_recorded_expectation >= max_expectations) {
+		FAIL_TEXT_C("too many expectations");
+	}
 	expectations[currently_recorded_expectation++].expectation_type = I2C_READ;
 }
 
 void MockI2C_Expect_I2C_WriteTo_and_check_buffer(uint16_t device_address, uint8_t len, const uint8_t *buffer)
 {
+	if (currently_recorded_expectation >= max_expectations) {
+		FAIL_TEXT_C("too many expectations");
+	}
 	expectations[currently_recorded_expectation++].expectation_type = I2C_WRITE;
 }
 

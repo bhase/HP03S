@@ -129,6 +129,20 @@ TEST(MockI2C, WrongSequence)
 	fixture->assertPrintContains("unexpected read");
 }
 
+static void TooManyExpectations(void)
+{
+	MockI2C_Expect_I2C_ReadFrom_and_fill_buffer(device_address, 1, buffer);
+	MockI2C_Expect_I2C_ReadFrom_and_fill_buffer(device_address, 1, buffer);
+	MockI2C_Expect_I2C_WriteTo_and_check_buffer(device_address, 1, buffer);
+	MockI2C_Expect_I2C_WriteTo_and_check_buffer(device_address, 1, buffer);
+}
+
+TEST(MockI2C, TooManyExpectations)
+{
+	testFailureWith(TooManyExpectations);
+	fixture->assertPrintContains("too many expectations");
+}
+
 /* what could go wrong?
  * - not enough read
  * - not enough write
