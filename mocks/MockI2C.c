@@ -5,6 +5,7 @@ typedef struct {
 	enum {
 		I2C_READ,
 		I2C_WRITE,
+		I2C_RUN,
 	} expectation_type;
 } Expectation;
 
@@ -46,6 +47,10 @@ void MockI2C_Expect_I2C_WriteTo_and_check_buffer(uint16_t device_address, uint8_
 
 void MockI2C_Expect_I2C_Run_and_return(I2C_Result result)
 {
+	if (last_recorded_expectation >= max_expectations) {
+		FAIL_TEXT_C("too many expectations");
+	}
+	expectations[last_recorded_expectation++].expectation_type = I2C_RUN;
 }
 
 void MockI2C_CheckExpectations(void)
@@ -73,6 +78,9 @@ void I2C_WriteTo(uint16_t device_address, uint8_t length, uint8_t *buffer)
 
 I2C_Result I2C_Run()
 {
+	if (expectations[last_used_expectation++].expectation_type != I2C_RUN) {
+		FAIL_TEXT_C("unexpected run");
+	}
 	return I2C_Ok;
 }
 

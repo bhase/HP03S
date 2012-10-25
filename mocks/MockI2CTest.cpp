@@ -42,6 +42,7 @@ TEST_GROUP(MockI2C)
 
 };
 
+
 static void CanMatchExpectations(void)
 {
 	MockI2C_Expect_I2C_ReadFrom_and_fill_buffer(device_address, 1, buffer);
@@ -62,6 +63,7 @@ TEST(MockI2C, CanMatchExpectations)
 	fixture->assertPrintContains("OK");
 }
 
+
 static void WriteWhenReadExpectedFails(void)
 {
 	MockI2C_Expect_I2C_ReadFrom_and_fill_buffer(device_address, 1, buffer);
@@ -75,6 +77,7 @@ TEST(MockI2C, WriteWhenReadExpectedFails)
 	fixture->assertPrintContains("unexpected write");
 }
 
+
 static void ReadWhenWriteExpectedFails(void)
 {
 	MockI2C_Expect_I2C_WriteTo_and_check_buffer(device_address, 1, buffer);
@@ -87,6 +90,7 @@ TEST(MockI2C, ReadWhenWriteExpectedFails)
 	testFailureWith(ReadWhenWriteExpectedFails);
 	fixture->assertPrintContains("unexpected read");
 }
+
 
 static void TooManyRead(void)
 {
@@ -102,6 +106,7 @@ TEST(MockI2C, TooManyRead)
 	fixture->assertPrintContains("unexpected read");
 }
 
+
 static void TooManyWrite(void)
 {
 	MockI2C_Expect_I2C_WriteTo_and_check_buffer(device_address, 1, buffer);
@@ -115,6 +120,7 @@ TEST(MockI2C, TooManyWrite)
 	testFailureWith(TooManyWrite);
 	fixture->assertPrintContains("unexpected write");
 }
+
 
 static void WrongSequence(void)
 {
@@ -131,6 +137,7 @@ TEST(MockI2C, WrongSequence)
 	fixture->assertPrintContains("unexpected read");
 }
 
+
 static void TooManyExpectations(void)
 {
 	MockI2C_Expect_I2C_ReadFrom_and_fill_buffer(device_address, 1, buffer);
@@ -145,12 +152,13 @@ TEST(MockI2C, TooManyExpectations)
 	fixture->assertPrintContains("too many expectations");
 }
 
+
 static void NotAllExpectationsUsed(void)
 {
 	MockI2C_Expect_I2C_WriteTo_and_check_buffer(device_address, 1, buffer);
 	MockI2C_Expect_I2C_Run_and_return(I2C_Ok);
 
-	I2C_Run();
+	I2C_WriteTo(device_address, 1, buffer);
 
 	MockI2C_CheckExpectations();
 }
@@ -159,6 +167,20 @@ TEST(MockI2C, NotAllExpectationsUsed)
 {
 	testFailureWith(NotAllExpectationsUsed);
 	fixture->assertPrintContains("unused expectations");
+}
+
+
+static void UnexpectedRun(void)
+{
+	MockI2C_Expect_I2C_WriteTo_and_check_buffer(device_address, 1, buffer);
+
+	I2C_Run();
+}
+
+TEST(MockI2C, UnexpectedRun)
+{
+	testFailureWith(UnexpectedRun);
+	fixture->assertPrintContains("unexpected run");
 }
 
 /* what could go wrong?
