@@ -183,6 +183,20 @@ TEST(MockI2C, UnexpectedRun)
 	fixture->assertPrintContains("unexpected run");
 }
 
+
+static void I2C_Read_WrongParameter_Address(void)
+{
+	MockI2C_Expect_I2C_ReadFrom_and_fill_buffer(device_address, 1, buffer);
+
+	I2C_ReadFrom((uint16_t)~device_address, 1, buffer);
+}
+
+TEST(MockI2C, I2C_Read_WrongParameter_Address)
+{
+	testFailureWith(I2C_Read_WrongParameter_Address);
+	fixture->assertPrintContains("device address mismatch");
+}
+
 /* what could go wrong?
  * - not enough read
  * - not enough write

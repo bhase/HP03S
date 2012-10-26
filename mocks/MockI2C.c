@@ -7,6 +7,7 @@ typedef struct {
 		I2C_WRITE,
 		I2C_RUN,
 	} expectation_type;
+	uint16_t address;
 } Expectation;
 
 static Expectation *expectations = NULL;
@@ -34,7 +35,9 @@ void MockI2C_Expect_I2C_ReadFrom_and_fill_buffer(uint16_t device_address, uint8_
 	if (last_recorded_expectation >= max_expectations) {
 		FAIL_TEXT_C("too many expectations");
 	}
-	expectations[last_recorded_expectation++].expectation_type = I2C_READ;
+	expectations[last_recorded_expectation].expectation_type = I2C_READ;
+	expectations[last_recorded_expectation].address = device_address;
+	last_recorded_expectation++;
 }
 
 void MockI2C_Expect_I2C_WriteTo_and_check_buffer(uint16_t device_address, uint8_t len, const uint8_t *buffer)
@@ -64,9 +67,13 @@ void MockI2C_CheckExpectations(void)
 
 void I2C_ReadFrom(uint16_t device_address, uint8_t length, uint8_t *buffer)
 {
-	if (expectations[last_used_expectation++].expectation_type != I2C_READ) {
+	if (expectations[last_used_expectation].expectation_type != I2C_READ) {
 		FAIL_TEXT_C("unexpected read");
 	}
+	if (expectations[last_used_expectation].address != device_address) {
+		FAIL_TEXT_C("device address mismatch");
+	}
+	last_used_expectation++;
 }
 
 void I2C_WriteTo(uint16_t device_address, uint8_t length, uint8_t *buffer)
