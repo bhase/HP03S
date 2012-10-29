@@ -9,6 +9,7 @@ typedef struct {
 	} expectation_type;
 	uint16_t address;
 	I2C_Result returnValue;
+	uint8_t length;
 } Expectation;
 
 static Expectation *expectations = NULL;
@@ -48,6 +49,7 @@ void MockI2C_Expect_I2C_WriteTo_and_check_buffer(uint16_t device_address, uint8_
 	}
 	expectations[last_recorded_expectation].expectation_type = I2C_WRITE;
 	expectations[last_recorded_expectation].address = device_address;
+	expectations[last_recorded_expectation].length = len;
 	last_recorded_expectation++;
 }
 
@@ -88,6 +90,9 @@ void I2C_WriteTo(uint16_t device_address, uint8_t length, uint8_t *buffer)
 	}
 	if (expectations[last_used_expectation].address != device_address) {
 		FAIL_TEXT_C("device address mismatch");
+	}
+	if (expectations[last_used_expectation].length != length) {
+		FAIL_TEXT_C("wrong length");
 	}
 	last_used_expectation++;
 }

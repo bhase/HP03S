@@ -230,6 +230,21 @@ TEST(MockI2C, MockI2C_Run_returns_given_parameter)
 	fixture->assertPrintContains("OK");
 }
 
+
+static void I2C_Write_WronParameter_Length(void)
+{
+	MockI2C_Expect_I2C_WriteTo_and_check_buffer(device_address, 4, buffer);
+
+	I2C_WriteTo(device_address, 3, buffer);
+}
+
+TEST(MockI2C, I2C_Write_WronParameter_Length)
+{
+	testFailureWith(I2C_Write_WronParameter_Length);
+	fixture->assertPrintContains("wrong length");
+}
+
+
 /* what could go wrong?
  * - not enough read
  * - not enough write
