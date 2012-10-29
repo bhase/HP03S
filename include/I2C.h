@@ -5,6 +5,8 @@
 
 typedef enum {
 	I2C_Ok = 0,
+	I2C_AckFailure,
+	I2C_Timeout,
 } I2C_Result;
 
 void I2C_ReadFrom(uint16_t device_address, uint8_t length, uint8_t *buffer);

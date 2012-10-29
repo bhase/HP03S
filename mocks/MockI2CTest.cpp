@@ -212,6 +212,24 @@ TEST(MockI2C, I2C_Write_WrongParameter_Address)
 }
 
 
+static void MockI2C_Run_returns_given_parameter(void)
+{
+	MockI2C_Expect_I2C_Run_and_return(I2C_Timeout);
+	MockI2C_Expect_I2C_Run_and_return(I2C_AckFailure);
+	MockI2C_Expect_I2C_Run_and_return(I2C_Ok);
+
+	LONGS_EQUAL(I2C_Run(), I2C_Timeout);
+	LONGS_EQUAL(I2C_Run(), I2C_AckFailure);
+	LONGS_EQUAL(I2C_Run(), I2C_Ok);
+}
+
+TEST(MockI2C, MockI2C_Run_returns_given_parameter)
+{
+	expectedErrors = 0;
+	testFailureWith(MockI2C_Run_returns_given_parameter);
+	fixture->assertPrintContains("OK");
+}
+
 /* what could go wrong?
  * - not enough read
  * - not enough write

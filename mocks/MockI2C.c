@@ -8,6 +8,7 @@ typedef struct {
 		I2C_RUN,
 	} expectation_type;
 	uint16_t address;
+	I2C_Result returnValue;
 } Expectation;
 
 static Expectation *expectations = NULL;
@@ -55,7 +56,9 @@ void MockI2C_Expect_I2C_Run_and_return(I2C_Result result)
 	if (last_recorded_expectation >= max_expectations) {
 		FAIL_TEXT_C("too many expectations");
 	}
-	expectations[last_recorded_expectation++].expectation_type = I2C_RUN;
+	expectations[last_recorded_expectation].expectation_type = I2C_RUN;
+	expectations[last_recorded_expectation].returnValue = result;
+	last_recorded_expectation++;
 }
 
 void MockI2C_CheckExpectations(void)
@@ -91,9 +94,9 @@ void I2C_WriteTo(uint16_t device_address, uint8_t length, uint8_t *buffer)
 
 I2C_Result I2C_Run()
 {
-	if (expectations[last_used_expectation++].expectation_type != I2C_RUN) {
+	if (expectations[last_used_expectation].expectation_type != I2C_RUN) {
 		FAIL_TEXT_C("unexpected run");
 	}
-	return I2C_Ok;
+	return expectations[last_used_expectation++].returnValue;
 }
 
