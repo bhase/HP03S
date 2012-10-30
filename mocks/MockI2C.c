@@ -39,6 +39,7 @@ void MockI2C_Expect_I2C_ReadFrom_and_fill_buffer(uint16_t device_address, uint8_
 	}
 	expectations[last_recorded_expectation].expectation_type = I2C_READ;
 	expectations[last_recorded_expectation].address = device_address;
+	expectations[last_recorded_expectation].length = len;
 	last_recorded_expectation++;
 }
 
@@ -79,6 +80,9 @@ void I2C_ReadFrom(uint16_t device_address, uint8_t length, uint8_t *buffer)
 	}
 	if (expectations[last_used_expectation].address != device_address) {
 		FAIL_TEXT_C("device address mismatch");
+	}
+	if (expectations[last_used_expectation].length != length) {
+		FAIL_TEXT_C("wrong length");
 	}
 	last_used_expectation++;
 }
