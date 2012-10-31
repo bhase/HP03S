@@ -122,6 +122,20 @@ TEST(MockI2C, TooManyWrite)
 }
 
 
+static void TooManyRun(void)
+{
+	MockI2C_Expect_I2C_Run_and_return(I2C_Ok);
+
+	I2C_Run();
+	I2C_Run();
+}
+
+TEST(MockI2C, TooManyRun)
+{
+	testFailureWith(TooManyRun);
+	fixture->assertPrintContains("not enough expectations");
+}
+
 static void WrongSequence(void)
 {
 	MockI2C_Expect_I2C_WriteTo_and_check_buffer(device_address, 1, buffer);

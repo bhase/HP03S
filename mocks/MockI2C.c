@@ -109,6 +109,9 @@ void I2C_WriteTo(uint16_t device_address, uint8_t length, uint8_t *buffer)
 
 I2C_Result I2C_Run()
 {
+	if (last_used_expectation >= last_recorded_expectation) {
+		FAIL_TEXT_C("not enough expectations");
+	}
 	if (expectations[last_used_expectation].expectation_type != I2C_RUN) {
 		FAIL_TEXT_C("unexpected run");
 	}
