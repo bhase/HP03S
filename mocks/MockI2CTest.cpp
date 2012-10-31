@@ -118,7 +118,7 @@ static void TooManyWrite(void)
 TEST(MockI2C, TooManyWrite)
 {
 	testFailureWith(TooManyWrite);
-	fixture->assertPrintContains("unexpected write");
+	fixture->assertPrintContains("not enough expectations");
 }
 
 
