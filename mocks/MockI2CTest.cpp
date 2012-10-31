@@ -103,7 +103,7 @@ static void TooManyRead(void)
 TEST(MockI2C, TooManyRead)
 {
 	testFailureWith(TooManyRead);
-	fixture->assertPrintContains("unexpected read");
+	fixture->assertPrintContains("not enough expectations");
 }
 
 
