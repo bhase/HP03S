@@ -293,6 +293,24 @@ TEST(MockI2C, I2C_Read_FillsBufferAsGiven)
 	fixture->assertPrintContains("OK");
 }
 
+
+static void I2C_Write_ChecksBuffer(void)
+{
+	uint8_t input_buffer[3] = {0xA, 0xB, 0xC};
+	buffer[0] = 1;
+
+	MockI2C_Expect_I2C_WriteTo_and_check_buffer(device_address, 3, input_buffer);
+
+	I2C_WriteTo(device_address, 3, buffer);
+}
+
+TEST(MockI2C, I2C_Write_ChecksBuffer)
+{
+	testFailureWith(I2C_Write_ChecksBuffer);
+	fixture->assertPrintContains("contents mismatch");
+}
+
+
 /* what could go wrong?
  * - not enough read
  * - not enough write
