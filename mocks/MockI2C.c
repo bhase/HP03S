@@ -49,6 +49,14 @@ static void failWhenExpectationIsNot(ExpectationType type, const char* message)
 }
 
 
+static void failWhenNotAllExpectionasUsed(void)
+{
+	if (last_used_expectation < last_recorded_expectation) {
+		FAIL_TEXT_C("there are unused expectations");
+	}
+}
+
+
 void MockI2C_Create(size_t size)
 {
 	last_used_expectation = 0;
@@ -101,9 +109,7 @@ void MockI2C_Expect_I2C_Run_and_return(I2C_Result result)
 
 void MockI2C_CheckExpectations(void)
 {
-	if (last_used_expectation < last_recorded_expectation) {
-		FAIL_TEXT_C("there are unused expectations");
-	}
+	failWhenNotAllExpectionasUsed();
 }
 
 
