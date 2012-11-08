@@ -310,12 +310,3 @@ TEST(MockI2C, I2C_Write_ChecksBuffer)
 	fixture->assertPrintContains("contents mismatch");
 }
 
-
-/* what could go wrong?
- * - not enough read
- * - not enough write
- * - wrong parameter:
- *   - device address
- *   - length
- *   - for writing buffer content - at least some byte (TODO ignore flag)
- */

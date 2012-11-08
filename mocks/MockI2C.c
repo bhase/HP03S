@@ -19,6 +19,23 @@ static int last_used_expectation = 0;
 static int last_recorded_expectation = 0;
 static size_t max_expectations = 0;
 
+
+static void failWhenNoFreeExpectationLeft(void)
+{
+	if (last_recorded_expectation >= max_expectations) {
+		FAIL_TEXT_C("too many expectations");
+	}
+}
+
+
+static void failWhenAllrecordedExpectationsUsed(void)
+{
+	if (last_used_expectation >= last_recorded_expectation) {
+		FAIL_TEXT_C("not enough expectations");
+	}
+}
+
+
 void MockI2C_Create(size_t size)
 {
 	last_used_expectation = 0;
@@ -38,11 +55,10 @@ void MockI2C_Destroy(void)
 	max_expectations = 0;
 }
 
+
 void MockI2C_Expect_I2C_ReadFrom_and_fill_buffer(uint16_t device_address, uint8_t len, uint8_t *buffer)
 {
-	if (last_recorded_expectation >= max_expectations) {
-		FAIL_TEXT_C("too many expectations");
-	}
+	failWhenNoFreeExpectationLeft();
 	expectations[last_recorded_expectation].expectation_type = I2C_READ;
 	expectations[last_recorded_expectation].address = device_address;
 	expectations[last_recorded_expectation].length = len;
@@ -53,9 +69,7 @@ void MockI2C_Expect_I2C_ReadFrom_and_fill_buffer(uint16_t device_address, uint8_
 
 void MockI2C_Expect_I2C_WriteTo_and_check_buffer(uint16_t device_address, uint8_t len, const uint8_t *buffer)
 {
-	if (last_recorded_expectation >= max_expectations) {
-		FAIL_TEXT_C("too many expectations");
-	}
+	failWhenNoFreeExpectationLeft();
 	expectations[last_recorded_expectation].expectation_type = I2C_WRITE;
 	expectations[last_recorded_expectation].address = device_address;
 	expectations[last_recorded_expectation].length = len;
@@ -66,9 +80,7 @@ void MockI2C_Expect_I2C_WriteTo_and_check_buffer(uint16_t device_address, uint8_
 
 void MockI2C_Expect_I2C_Run_and_return(I2C_Result result)
 {
-	if (last_recorded_expectation >= max_expectations) {
-		FAIL_TEXT_C("too many expectations");
-	}
+	failWhenNoFreeExpectationLeft();
 	expectations[last_recorded_expectation].expectation_type = I2C_RUN;
 	expectations[last_recorded_expectation].returnValue = result;
 	last_recorded_expectation++;
@@ -81,13 +93,12 @@ void MockI2C_CheckExpectations(void)
 	}
 }
 
+
 /* I2C dummy implementation */
 
 void I2C_ReadFrom(uint16_t device_address, uint8_t length, uint8_t *buffer)
 {
-	if (last_used_expectation >= last_recorded_expectation) {
-		FAIL_TEXT_C("not enough expectations");
-	}
+	failWhenAllrecordedExpectationsUsed();
 	if (expectations[last_used_expectation].expectation_type != I2C_READ) {
 		FAIL_TEXT_C("unexpected read");
 	}
@@ -103,9 +114,7 @@ void I2C_ReadFrom(uint16_t device_address, uint8_t length, uint8_t *buffer)
 
 void I2C_WriteTo(uint16_t device_address, uint8_t length, uint8_t *buffer)
 {
-	if (last_used_expectation >= last_recorded_expectation) {
-		FAIL_TEXT_C("not enough expectations");
-	}
+	failWhenAllrecordedExpectationsUsed();
 	if (expectations[last_used_expectation].expectation_type != I2C_WRITE) {
 		FAIL_TEXT_C("unexpected write");
 	}
@@ -123,9 +132,7 @@ void I2C_WriteTo(uint16_t device_address, uint8_t length, uint8_t *buffer)
 
 I2C_Result I2C_Run()
 {
-	if (last_used_expectation >= last_recorded_expectation) {
-		FAIL_TEXT_C("not enough expectations");
-	}
+	failWhenAllrecordedExpectationsUsed();
 	if (expectations[last_used_expectation].expectation_type != I2C_RUN) {
 		FAIL_TEXT_C("unexpected run");
 	}
