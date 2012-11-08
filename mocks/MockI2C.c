@@ -2,12 +2,14 @@
 #include "MockI2C.h"
 #include "CppUTest/TestHarness_c.h"
 
+typedef enum {
+	I2C_READ,
+	I2C_WRITE,
+	I2C_RUN,
+} ExpectationType;
+
 typedef struct {
-	enum {
-		I2C_READ,
-		I2C_WRITE,
-		I2C_RUN,
-	} expectation_type;
+	ExpectationType expectation_type;
 	uint16_t address;
 	I2C_Result returnValue;
 	uint8_t length;
@@ -19,6 +21,9 @@ static int last_used_expectation = 0;
 static int last_recorded_expectation = 0;
 static size_t max_expectations = 0;
 
+static const char* unexpected_write = "unexpected write";
+static const char* unexpected_run   = "unexpected run";
+static const char* unexpected_read  = "unexpected read";
 
 static void failWhenNoFreeExpectationLeft(void)
 {
@@ -32,6 +37,14 @@ static void failWhenAllrecordedExpectationsUsed(void)
 {
 	if (last_used_expectation >= last_recorded_expectation) {
 		FAIL_TEXT_C("not enough expectations");
+	}
+}
+
+
+static void failWhenExpectationIsNot(ExpectationType type, const char* message)
+{
+	if (expectations[last_used_expectation].expectation_type != type) {
+		FAIL_TEXT_C(message);
 	}
 }
 
@@ -99,9 +112,7 @@ void MockI2C_CheckExpectations(void)
 void I2C_ReadFrom(uint16_t device_address, uint8_t length, uint8_t *buffer)
 {
 	failWhenAllrecordedExpectationsUsed();
-	if (expectations[last_used_expectation].expectation_type != I2C_READ) {
-		FAIL_TEXT_C("unexpected read");
-	}
+	failWhenExpectationIsNot(I2C_READ, unexpected_read);
 	if (expectations[last_used_expectation].address != device_address) {
 		FAIL_TEXT_C("device address mismatch");
 	}
@@ -115,9 +126,7 @@ void I2C_ReadFrom(uint16_t device_address, uint8_t length, uint8_t *buffer)
 void I2C_WriteTo(uint16_t device_address, uint8_t length, uint8_t *buffer)
 {
 	failWhenAllrecordedExpectationsUsed();
-	if (expectations[last_used_expectation].expectation_type != I2C_WRITE) {
-		FAIL_TEXT_C("unexpected write");
-	}
+	failWhenExpectationIsNot(I2C_WRITE, unexpected_write);
 	if (expectations[last_used_expectation].address != device_address) {
 		FAIL_TEXT_C("device address mismatch");
 	}
@@ -133,9 +142,7 @@ void I2C_WriteTo(uint16_t device_address, uint8_t length, uint8_t *buffer)
 I2C_Result I2C_Run()
 {
 	failWhenAllrecordedExpectationsUsed();
-	if (expectations[last_used_expectation].expectation_type != I2C_RUN) {
-		FAIL_TEXT_C("unexpected run");
-	}
+	failWhenExpectationIsNot(I2C_RUN, unexpected_run);
 	return expectations[last_used_expectation++].returnValue;
 }
 
