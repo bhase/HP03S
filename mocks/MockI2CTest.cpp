@@ -273,6 +273,26 @@ TEST(MockI2C, I2C_Read_WrongParameter_Length)
 }
 
 
+static void I2C_Read_FillsBufferAsGiven(void)
+{
+	uint8_t output_buffer[3];
+
+	buffer[0] = 0x55;
+	buffer[1] = 0xAA;
+	buffer[2] = 0x77;
+
+	MockI2C_Expect_I2C_ReadFrom_and_fill_buffer(device_address, 3, buffer);
+	I2C_ReadFrom(device_address, 3, output_buffer);
+	CHECK(memcmp(buffer, output_buffer, 3) == 0);
+}
+
+TEST(MockI2C, I2C_Read_FillsBufferAsGiven)
+{
+	expectedErrors = 0;
+	testFailureWith(I2C_Read_FillsBufferAsGiven);
+	fixture->assertPrintContains("OK");
+}
+
 /* what could go wrong?
  * - not enough read
  * - not enough write

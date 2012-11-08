@@ -1,3 +1,4 @@
+#include <string.h>
 #include "MockI2C.h"
 #include "CppUTest/TestHarness_c.h"
 
@@ -10,6 +11,7 @@ typedef struct {
 	uint16_t address;
 	I2C_Result returnValue;
 	uint8_t length;
+	uint8_t *buffer;
 } Expectation;
 
 static Expectation *expectations = NULL;
@@ -21,12 +23,16 @@ void MockI2C_Create(size_t size)
 {
 	last_used_expectation = 0;
 	last_recorded_expectation = 0;
-	expectations = malloc(sizeof(Expectation) * size);
+	expectations = calloc(sizeof(Expectation), size);
 	max_expectations = size;
 }
 
 void MockI2C_Destroy(void)
 {
+	int i = 0;
+	for (i = 0; i < max_expectations; i++) {
+		free(expectations[i].buffer);
+	}
 	free(expectations);
 	expectations = NULL;
 	max_expectations = 0;
@@ -40,6 +46,8 @@ void MockI2C_Expect_I2C_ReadFrom_and_fill_buffer(uint16_t device_address, uint8_
 	expectations[last_recorded_expectation].expectation_type = I2C_READ;
 	expectations[last_recorded_expectation].address = device_address;
 	expectations[last_recorded_expectation].length = len;
+	expectations[last_recorded_expectation].buffer = malloc(len);
+	memcpy(expectations[last_recorded_expectation].buffer, buffer, len);
 	last_recorded_expectation++;
 }
 
@@ -87,6 +95,7 @@ void I2C_ReadFrom(uint16_t device_address, uint8_t length, uint8_t *buffer)
 	if (expectations[last_used_expectation].length != length) {
 		FAIL_TEXT_C("wrong length");
 	}
+	memcpy(buffer, expectations[last_used_expectation].buffer, length);
 	last_used_expectation++;
 }
 
