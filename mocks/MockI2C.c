@@ -73,6 +73,14 @@ static void failWhenRecordedAddressIsNot(uint16_t device_address)
 }
 
 
+static void failWhenRecordedLengthIsNot(uint8_t length)
+{
+	if (expectations[last_used_expectation].length != length) {
+		FAIL_TEXT_C("wrong length");
+	}
+}
+
+
 void MockI2C_Create(size_t size)
 {
 	last_used_expectation = 0;
@@ -139,9 +147,7 @@ void I2C_ReadFrom(uint16_t device_address, uint8_t length, uint8_t *buffer)
 	failWhenAllrecordedExpectationsUsed();
 	failWhenExpectationIsNot(I2C_READ, unexpected_read);
 	failWhenRecordedAddressIsNot(device_address);
-	if (expectations[last_used_expectation].length != length) {
-		FAIL_TEXT_C("wrong length");
-	}
+	failWhenRecordedLengthIsNot(length);
 	memcpy(buffer, expectations[last_used_expectation].buffer, length);
 	last_used_expectation++;
 }
@@ -151,9 +157,7 @@ void I2C_WriteTo(uint16_t device_address, uint8_t length, uint8_t *buffer)
 	failWhenAllrecordedExpectationsUsed();
 	failWhenExpectationIsNot(I2C_WRITE, unexpected_write);
 	failWhenRecordedAddressIsNot(device_address);
-	if (expectations[last_used_expectation].length != length) {
-		FAIL_TEXT_C("wrong length");
-	}
+	failWhenRecordedLengthIsNot(length);
 	if (memcmp(expectations[last_used_expectation].buffer, buffer, length) != 0) {
 		FAIL_TEXT_C("contents mismatch");
 	}
