@@ -90,6 +90,9 @@ void MockI2C_Expect_I2C_ReadFrom_and_fill_buffer(uint16_t device_address, uint8_
 
 void MockI2C_Expect_I2C_WriteTo_and_check_buffer(uint16_t device_address, uint8_t len, const uint8_t *buffer)
 {
+	if (expectations == NULL) {
+		FAIL_TEXT_C("not initialized");
+	}
 	failWhenNoFreeExpectationLeft();
 	expectations[last_recorded_expectation].expectation_type = I2C_WRITE;
 	expectations[last_recorded_expectation].address = device_address;

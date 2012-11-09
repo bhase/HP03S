@@ -310,3 +310,16 @@ TEST(MockI2C, I2C_Write_ChecksBuffer)
 	fixture->assertPrintContains("contents mismatch");
 }
 
+
+static void NotInitialized_Write(void)
+{
+	MockI2C_Destroy();
+
+	MockI2C_Expect_I2C_WriteTo_and_check_buffer(device_address, 1, buffer);
+}
+
+TEST(MockI2C, NotInitialized_Write)
+{
+	testFailureWith(NotInitialized_Write);
+	fixture->assertPrintContains("not initialized");
+}
