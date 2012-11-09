@@ -111,6 +111,7 @@ void MockI2C_Expect_I2C_WriteTo_and_check_buffer(uint16_t device_address, uint8_
 
 void MockI2C_Expect_I2C_Run_and_return(I2C_Result result)
 {
+	failWhenNotInitialized();
 	failWhenNoFreeExpectationLeft();
 	expectations[last_recorded_expectation].expectation_type = I2C_RUN;
 	expectations[last_recorded_expectation].returnValue = result;

@@ -337,3 +337,17 @@ TEST(MockI2C, NotInitialized_Read)
 	testFailureWith(NotInitialized_Read);
 	fixture->assertPrintContains("not initialized");
 }
+
+
+static void NotInitialized_Run(void)
+{
+	MockI2C_Destroy();
+
+	MockI2C_Expect_I2C_Run_and_return(I2C_Ok);
+}
+
+TEST(MockI2C, NotInitialized_Run)
+{
+	testFailureWith(NotInitialized_Run);
+	fixture->assertPrintContains("not initialized");
+}
