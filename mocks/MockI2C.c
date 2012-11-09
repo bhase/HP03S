@@ -87,6 +87,7 @@ void MockI2C_Destroy(void)
 
 void MockI2C_Expect_I2C_ReadFrom_and_fill_buffer(uint16_t device_address, uint8_t len, uint8_t *buffer)
 {
+	failWhenNotInitialized();
 	failWhenNoFreeExpectationLeft();
 	expectations[last_recorded_expectation].expectation_type = I2C_READ;
 	expectations[last_recorded_expectation].address = device_address;

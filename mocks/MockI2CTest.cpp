@@ -323,3 +323,17 @@ TEST(MockI2C, NotInitialized_Write)
 	testFailureWith(NotInitialized_Write);
 	fixture->assertPrintContains("not initialized");
 }
+
+
+static void NotInitialized_Read(void)
+{
+	MockI2C_Destroy();
+
+	MockI2C_Expect_I2C_ReadFrom_and_fill_buffer(device_address, 1, buffer);
+}
+
+TEST(MockI2C, NotInitialized_Read)
+{
+	testFailureWith(NotInitialized_Read);
+	fixture->assertPrintContains("not initialized");
+}
