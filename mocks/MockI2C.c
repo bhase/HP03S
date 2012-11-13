@@ -89,6 +89,18 @@ static void failWhenRecordedBufferDiffers(uint8_t *buffer, uint8_t length)
 }
 
 
+static void recordExpectation(ExpectationType type,
+			      uint16_t addr, uint8_t len, const uint8_t *buf)
+{
+	expectations[last_recorded_expectation].expectation_type = type;
+	expectations[last_recorded_expectation].address = addr;
+	expectations[last_recorded_expectation].length = len;
+	expectations[last_recorded_expectation].buffer = malloc(len);
+	memcpy(expectations[last_recorded_expectation].buffer, buf, len);
+	last_recorded_expectation++;
+}
+
+
 void MockI2C_Create(size_t size)
 {
 	last_used_expectation = 0;
@@ -109,28 +121,18 @@ void MockI2C_Destroy(void)
 }
 
 
-void MockI2C_Expect_I2C_ReadFrom_and_fill_buffer(uint16_t device_address, uint8_t len, uint8_t *buffer)
+void MockI2C_Expect_I2C_ReadFrom_and_fill_buffer(uint16_t device_address, uint8_t len, const uint8_t *buffer)
 {
 	failWhenNotInitialized();
 	failWhenNoFreeExpectationLeft();
-	expectations[last_recorded_expectation].expectation_type = I2C_READ;
-	expectations[last_recorded_expectation].address = device_address;
-	expectations[last_recorded_expectation].length = len;
-	expectations[last_recorded_expectation].buffer = malloc(len);
-	memcpy(expectations[last_recorded_expectation].buffer, buffer, len);
-	last_recorded_expectation++;
+	recordExpectation(I2C_READ, device_address, len, buffer);
 }
 
 void MockI2C_Expect_I2C_WriteTo_and_check_buffer(uint16_t device_address, uint8_t len, const uint8_t *buffer)
 {
 	failWhenNotInitialized();
 	failWhenNoFreeExpectationLeft();
-	expectations[last_recorded_expectation].expectation_type = I2C_WRITE;
-	expectations[last_recorded_expectation].address = device_address;
-	expectations[last_recorded_expectation].length = len;
-	expectations[last_recorded_expectation].buffer = malloc(len);
-	memcpy(expectations[last_recorded_expectation].buffer, buffer, len);
-	last_recorded_expectation++;
+	recordExpectation(I2C_WRITE, device_address, len, buffer);
 }
 
 void MockI2C_Expect_I2C_Run_and_return(I2C_Result result)
