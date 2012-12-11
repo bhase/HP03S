@@ -1,4 +1,5 @@
 #include <string.h>
+#include <stdarg.h>
 #include "MockI2C.h"
 #include "CppUTest/TestHarness_c.h"
 
@@ -89,15 +90,29 @@ static void failWhenRecordedBufferDiffers(uint8_t *buffer, uint8_t length)
 }
 
 
-static void recordExpectation(ExpectationType type,
-			      uint16_t addr, uint8_t len, const uint8_t *buf)
+static void recordExpectation(ExpectationType type, ...)
 {
+	va_list ap;
+	va_start(ap, type);
+
 	expectations[last_recorded_expectation].expectation_type = type;
-	expectations[last_recorded_expectation].address = addr;
-	expectations[last_recorded_expectation].length = len;
-	expectations[last_recorded_expectation].buffer = malloc(len);
-	memcpy(expectations[last_recorded_expectation].buffer, buf, len);
+	if (type == I2C_RUN) {
+		I2C_Result res = va_arg(ap, int);
+		expectations[last_recorded_expectation].returnValue = res;
+	}
+	else {
+		uint16_t address = (uint16_t)va_arg(ap, int);
+		uint8_t len = (uint8_t)va_arg(ap, int);
+		uint8_t *buf = (uint8_t *)va_arg(ap, uint8_t *);
+
+		expectations[last_recorded_expectation].address = address;
+		expectations[last_recorded_expectation].length = len;
+		expectations[last_recorded_expectation].buffer = malloc(len);
+		memcpy(expectations[last_recorded_expectation].buffer, buf, len);
+	}
 	last_recorded_expectation++;
+
+	va_end(ap);
 }
 
 
@@ -139,9 +154,7 @@ void MockI2C_Expect_I2C_Run_and_return(I2C_Result result)
 {
 	failWhenNotInitialized();
 	failWhenNoFreeExpectationLeft();
-	expectations[last_recorded_expectation].expectation_type = I2C_RUN;
-	expectations[last_recorded_expectation].returnValue = result;
-	last_recorded_expectation++;
+	recordExpectation(I2C_RUN, result);
 }
 
 void MockI2C_CheckExpectations(void)
