@@ -3,6 +3,7 @@
 #include "MockI2C.h"
 #include "CppUTest/TestHarness_c.h"
 
+
 typedef enum {
 	I2C_READ,
 	I2C_WRITE,
@@ -17,6 +18,7 @@ typedef struct {
 	uint8_t *buffer;
 } Expectation;
 
+
 static Expectation *expectations = NULL;
 static int last_used_expectation = 0;
 static int last_recorded_expectation = 0;
@@ -25,6 +27,7 @@ static size_t max_expectations = 0;
 static const char* unexpected_write = "unexpected write";
 static const char* unexpected_run   = "unexpected run";
 static const char* unexpected_read  = "unexpected read";
+
 
 static void failWhenNoFreeExpectationLeft(void)
 {
@@ -136,14 +139,18 @@ void MockI2C_Destroy(void)
 }
 
 
-void MockI2C_Expect_I2C_ReadFrom_and_fill_buffer(uint16_t device_address, uint8_t len, const uint8_t *buffer)
+void MockI2C_Expect_I2C_ReadFrom_and_fill_buffer(uint16_t device_address,
+						 uint8_t len,
+						 const uint8_t *buffer)
 {
 	failWhenNotInitialized();
 	failWhenNoFreeExpectationLeft();
 	recordExpectation(I2C_READ, device_address, len, buffer);
 }
 
-void MockI2C_Expect_I2C_WriteTo_and_check_buffer(uint16_t device_address, uint8_t len, const uint8_t *buffer)
+void MockI2C_Expect_I2C_WriteTo_and_check_buffer(uint16_t device_address,
+						 uint8_t len,
+						 const uint8_t *buffer)
 {
 	failWhenNotInitialized();
 	failWhenNoFreeExpectationLeft();

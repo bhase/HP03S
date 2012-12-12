@@ -27,17 +27,25 @@ static struct
 	uint8_t D;
 } sensor_parameters;
 
+
 void HP03S_Create(void)
 {
 	GPIO_SetXCLR_Low();
 
-	sensor_coefficients.C1 = HP03S_ReadSensorCoefficient(C1_SensitivityCoefficient);
-	sensor_coefficients.C2 = HP03S_ReadSensorCoefficient(C2_OffsetCoefficient);
-	sensor_coefficients.C3 = HP03S_ReadSensorCoefficient(C3_TemperatureCoefficientOfSensitivity);
-	sensor_coefficients.C4 = HP03S_ReadSensorCoefficient(C4_TemperatureCoefficientOfOffset);
-	sensor_coefficients.C5 = HP03S_ReadSensorCoefficient(C5_ReferenceTemperature);
-	sensor_coefficients.C6 = HP03S_ReadSensorCoefficient(C6_TemperatureCoefficientOfTemperature);
-	sensor_coefficients.C7 = HP03S_ReadSensorCoefficient(C7_OffsetFineTuning);
+	sensor_coefficients.C1 =
+		HP03S_ReadSensorCoefficient(C1_SensitivityCoefficient);
+	sensor_coefficients.C2 =
+	       HP03S_ReadSensorCoefficient(C2_OffsetCoefficient);
+	sensor_coefficients.C3 =
+	       HP03S_ReadSensorCoefficient(C3_TemperatureCoefficientOfSensitivity);
+	sensor_coefficients.C4 =
+	       HP03S_ReadSensorCoefficient(C4_TemperatureCoefficientOfOffset);
+	sensor_coefficients.C5 =
+	       HP03S_ReadSensorCoefficient(C5_ReferenceTemperature);
+	sensor_coefficients.C6 =
+	       HP03S_ReadSensorCoefficient(C6_TemperatureCoefficientOfTemperature);
+	sensor_coefficients.C7 =
+	       HP03S_ReadSensorCoefficient(C7_OffsetFineTuning);
 
 	sensor_parameters.A = HP03S_ReadSensorParameter(SensorParameter_A);
 	sensor_parameters.B = HP03S_ReadSensorParameter(SensorParameter_B);
@@ -73,16 +81,21 @@ void HP03S_Measure(void)
 
 	int temperature_distance  = measured_temperature - sensor_coefficients.C5;
 	/* 64 bit is needed for high temperatures */
-	int64_t factor = measured_temperature < sensor_coefficients.C5 ? sensor_parameters.B : sensor_parameters.A;
+	int64_t factor = measured_temperature < sensor_coefficients.C5
+		       ? sensor_parameters.B
+		       : sensor_parameters.A;
 	int64_t dUT = temperature_distance -
 		((temperature_distance * factor * temperature_distance) /
-		(16384l * (1 << sensor_parameters.C)));
-	int OFF = 4 * sensor_coefficients.C2 +(int)( (4 * (sensor_coefficients.C4 - 1024) * dUT) / 16384);
-	int SENS = sensor_coefficients.C1 + (int)((sensor_coefficients.C3 * dUT) / 1024);
+		 (16384l * (1 << sensor_parameters.C)));
+	int OFF = 4 * sensor_coefficients.C2
+		+ (int)((4 * (sensor_coefficients.C4 - 1024) * dUT) / 16384);
+	int SENS = sensor_coefficients.C1
+		 + (int)((sensor_coefficients.C3 * dUT) / 1024);
 	int X = (int)((SENS * (int64_t)(measured_pressure - 7168)) / 16384) - OFF;
 
 	calculated.pressure = X * 10 / 32 + sensor_coefficients.C7;
-	calculated.temperature = 250 + (int)((dUT * sensor_coefficients.C6) / 65536) - (int)(dUT / (1 << sensor_parameters.D));
+	calculated.temperature = 250 + (int)((dUT * sensor_coefficients.C6) / 65536)
+		                     - (int)(dUT / (1 << sensor_parameters.D));
 }
 
 
@@ -105,6 +118,7 @@ static uint16_t HP03S_ReadPressureImpl(void)
 {
 	return 0;
 }
+
 
 uint16_t (*HP03S_ReadSensorCoefficient)(SensorCoefficient coefficient) =
 	HP03S_ReadSensorCoefficientImpl;
