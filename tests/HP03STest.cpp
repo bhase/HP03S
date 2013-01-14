@@ -36,6 +36,8 @@ static uint8_t Mock_ReadSensorParameter(SensorParameter param)
 TEST_GROUP(HP03S)
 {
 
+	HP03S_Result measure_result;
+
 	void setup_default_coefficients(void)
 	{
 		sensor_coefficients[C1_SensitivityCoefficient] = 29908;
@@ -67,6 +69,8 @@ TEST_GROUP(HP03S)
 		setup_default_coefficients();
 		setup_default_ad_values();
 
+		measure_result = HP03S_ERROR;
+
 		UT_PTR_SET(HP03S_ReadSensorParameter, Mock_ReadSensorParameter);
 		UT_PTR_SET(HP03S_ReadSensorCoefficient, Mock_ReadSensorCoefficient);
 		UT_PTR_SET(HP03S_ReadPressure, Mock_ReadPressure);
@@ -77,6 +81,7 @@ TEST_GROUP(HP03S)
 
 	void teardown()
 	{
+		LONGS_EQUAL(measure_result, HP03S_OK);
 		HP03S_Destroy();
 	}
 };
@@ -123,7 +128,7 @@ T= 250 + (-5478) * 3990 /2^16- (-5478/2^9) =-72 = -7.2°C
 
 TEST(HP03S, DataSheetExample)
 {
-	HP03S_Measure();
+	measure_result = HP03S_Measure();
 	/* the data sheet calculation gives -7,2 degree as result
 	 * but if you truncate the intermediate result of the first division
 	 * like the compiler does you get -7,3 degree */
@@ -134,7 +139,7 @@ TEST(HP03S, DataSheetExample)
 TEST(HP03S, TemperatureMin)
 {
 	ad_temperature = 0;
-	HP03S_Measure();
+	measure_result = HP03S_Measure();
 
 	LONGS_EQUAL(-367, HP03S_GetTemperature());
 	LONGS_EQUAL(9031, HP03S_GetPressure())
@@ -143,7 +148,7 @@ TEST(HP03S, TemperatureMin)
 TEST(HP03S, TemperatureMax)
 {
 	ad_temperature = 0xFFFF;
-	HP03S_Measure();
+	measure_result = HP03S_Measure();
 
 	LONGS_EQUAL(2857, HP03S_GetTemperature());
 	LONGS_EQUAL(18735, HP03S_GetPressure())
@@ -152,7 +157,7 @@ TEST(HP03S, TemperatureMax)
 TEST(HP03S, PressureMin)
 {
 	ad_pressure = 0;
-	HP03S_Measure();
+	measure_result = HP03S_Measure();
 
 	LONGS_EQUAL(-73, HP03S_GetTemperature());
 	LONGS_EQUAL(-6259, HP03S_GetPressure())
@@ -161,7 +166,7 @@ TEST(HP03S, PressureMin)
 TEST(HP03S, PressureMax)
 {
 	ad_pressure = 0xFFFF;
-	HP03S_Measure();
+	measure_result = HP03S_Measure();
 
 	LONGS_EQUAL(-73, HP03S_GetTemperature());
 	LONGS_EQUAL(29038, HP03S_GetPressure())
@@ -170,6 +175,7 @@ TEST(HP03S, PressureMax)
 
 TEST_GROUP(HP03S_Coefficients)
 {
+	HP03S_Result measure_result;
 
 	void setup_default_coefficients(void)
 	{
@@ -202,6 +208,8 @@ TEST_GROUP(HP03S_Coefficients)
 		setup_default_coefficients();
 		setup_default_ad_values();
 
+		measure_result = HP03S_ERROR;
+
 		UT_PTR_SET(HP03S_ReadSensorParameter, Mock_ReadSensorParameter);
 		UT_PTR_SET(HP03S_ReadSensorCoefficient, Mock_ReadSensorCoefficient);
 		UT_PTR_SET(HP03S_ReadPressure, Mock_ReadPressure);
@@ -210,6 +218,7 @@ TEST_GROUP(HP03S_Coefficients)
 
 	void teardown()
 	{
+		LONGS_EQUAL(measure_result, HP03S_OK);
 		HP03S_Destroy();
 	}
 
@@ -217,14 +226,14 @@ TEST_GROUP(HP03S_Coefficients)
 	{
 		sensor_coefficients[c] = value;
 		HP03S_Create();
-		HP03S_Measure();
+		measure_result = HP03S_Measure();
 	}
 
 	void testWithParameter(SensorParameter p, uint8_t value)
 	{
 		sensor_parameters[p] = value;
 		HP03S_Create();
-		HP03S_Measure();
+		measure_result = HP03S_Measure();
 	}
 };
 
@@ -429,7 +438,7 @@ TEST(HP03S_Coefficients, MaximumValues)
 	ad_pressure = 65535;
 
 	HP03S_Create();
-	HP03S_Measure();
+	measure_result = HP03S_Measure();
 
 	LONGS_EQUAL(1799231, HP03S_GetTemperature());
 	LONGS_EQUAL(-8497573, HP03S_GetPressure());
@@ -454,7 +463,7 @@ TEST(HP03S_Coefficients, MinimumValues)
 	ad_pressure = 0;
 
 	HP03S_Create();
-	HP03S_Measure();
+	measure_result = HP03S_Measure();
 
 	LONGS_EQUAL(252, HP03S_GetTemperature());
 	LONGS_EQUAL(7487, HP03S_GetPressure());

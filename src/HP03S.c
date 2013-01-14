@@ -28,7 +28,7 @@ static struct
 } sensor_parameters;
 
 
-void HP03S_Create(void)
+HP03S_Result HP03S_Create(void)
 {
 	GPIO_SetXCLR_Low();
 
@@ -51,6 +51,8 @@ void HP03S_Create(void)
 	sensor_parameters.B = HP03S_ReadSensorParameter(SensorParameter_B);
 	sensor_parameters.C = HP03S_ReadSensorParameter(SensorParameter_C);
 	sensor_parameters.D = HP03S_ReadSensorParameter(SensorParameter_D);
+
+	return HP03S_OK;
 }
 
 void HP03S_Destroy(void)
@@ -69,7 +71,7 @@ Pressure HP03S_GetPressure(void)
 }
 
 
-void HP03S_Measure(void)
+HP03S_Result HP03S_Measure(void)
 {
 	uint16_t measured_temperature;
 	uint16_t measured_pressure;
@@ -96,6 +98,8 @@ void HP03S_Measure(void)
 	calculated.pressure = X * 10 / 32 + sensor_coefficients.C7;
 	calculated.temperature = 250 + (int)((dUT * sensor_coefficients.C6) / 65536)
 		                     - (int)(dUT / (1 << sensor_parameters.D));
+
+	return HP03S_OK;
 }
 
 
