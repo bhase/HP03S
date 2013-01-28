@@ -27,6 +27,10 @@ static struct
 	uint8_t D;
 } sensor_parameters;
 
+static enum {
+	UnInitialized = 0,
+	Ready,
+} module_state;
 
 HP03S_Result HP03S_Create(void)
 {
@@ -52,11 +56,13 @@ HP03S_Result HP03S_Create(void)
 	sensor_parameters.C = HP03S_ReadSensorParameter(SensorParameter_C);
 	sensor_parameters.D = HP03S_ReadSensorParameter(SensorParameter_D);
 
+	module_state = Ready;
 	return HP03S_OK;
 }
 
 void HP03S_Destroy(void)
 {
+	module_state = UnInitialized;
 }
 
 
@@ -75,6 +81,9 @@ HP03S_Result HP03S_Measure(void)
 {
 	uint16_t measured_temperature;
 	uint16_t measured_pressure;
+
+	if (module_state == UnInitialized)
+		return HP03S_UNINITIALIZED;
 
 	GPIO_SetXCLR_High();
 	measured_temperature = HP03S_ReadTemperature();

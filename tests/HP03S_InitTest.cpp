@@ -30,19 +30,21 @@ static uint8_t Mock_HP03S_ReadSensorParameter(SensorParameter parameter)
 TEST_GROUP(HP03S_Init)
 {
 	HP03S_Result init_result;
+	HP03S_Result expected_result;
 
 	void setup()
 	{
 		UT_PTR_SET(HP03S_ReadSensorCoefficient, Mock_HP03S_ReadSensorCoefficient);
 		UT_PTR_SET(HP03S_ReadSensorParameter, Mock_HP03S_ReadSensorParameter);
 		init_result = HP03S_ERROR;
+		expected_result = HP03S_OK;
 	}
 
 	void teardown()
 	{
 		mock_c()->checkExpectations();
 		mock_c()->clear();
-		LONGS_EQUAL(init_result, HP03S_OK);
+		LONGS_EQUAL(init_result, expected_result);
 	}
 };
 
@@ -73,5 +75,11 @@ TEST(HP03S_Init, Create)
 		->withIntParameters("parameter", SensorParameter_D);
 
 	init_result = HP03S_Create();
+}
+
+TEST(HP03S_Init, Uninitialized)
+{
+	expected_result = HP03S_UNINITIALIZED;
+	init_result = HP03S_Measure();
 }
 
