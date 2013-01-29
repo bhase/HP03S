@@ -10,3 +10,12 @@ From the Hope page:
 
 Available for example at Pollin
 http://www.pollin.de/shop/dt/MDg4OTgxOTk-/Bausaetze_Module/Module/Luftdruck_Modul_HP03S.html
+
+Requirements
+============
+the build is done with make, tests are done with CppUTest
+(http://www.cpputest.org). To build and run the tests (for which this
+Makefile is configured), you need to have installed CppUTest and put it in
+../CppUTest or set the environment variable CPPUTEST_HOME.
+
+For building with rake, you need ruby, rake and the gem rake-builder.
