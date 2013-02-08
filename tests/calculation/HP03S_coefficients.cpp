@@ -6,19 +6,15 @@ extern "C"
 #include "HP03S_internal.h"
 
 static uint16_t sensor_coefficients[7];
-static uint8_t sensor_parameters[4];
-
-static uint16_t ad_temperature = 0;
-static uint16_t ad_pressure = 0;
 
 static uint16_t Mock_ReadPressure(void)
 {
-	return ad_pressure;
+	return 30036;
 }
 
 static uint16_t Mock_ReadTemperature(void)
 {
-	return ad_temperature;
+	return 4107;
 }
 
 static uint16_t Mock_ReadSensorCoefficient(SensorCoefficient coefficient)
@@ -28,6 +24,12 @@ static uint16_t Mock_ReadSensorCoefficient(SensorCoefficient coefficient)
 
 static uint8_t Mock_ReadSensorParameter(SensorParameter param)
 {
+	const uint8_t sensor_parameters[4] = {
+		/* SensorParameter_A */ 1,
+		/* SensorParameter_B */ 4,
+		/* SensorParameter_C */ 4,
+		/* SensorParameter_D */ 9,
+	};
 	return sensor_parameters[param];
 }
 
@@ -50,25 +52,9 @@ TEST_GROUP(HP03S_Coefficients)
 		sensor_coefficients[C7_OffsetFineTuning] = 2500;
 	}
 
-	void setup_default_parameter(void)
-	{
-		sensor_parameters[SensorParameter_A] = 1;
-		sensor_parameters[SensorParameter_B] = 4;
-		sensor_parameters[SensorParameter_C] = 4;
-		sensor_parameters[SensorParameter_D] = 9;
-	}
-
-	void setup_default_ad_values(void)
-	{
-		ad_temperature = 4107;
-		ad_pressure = 30036;
-	}
-
 	void setup()
 	{
-		setup_default_parameter();
 		setup_default_coefficients();
-		setup_default_ad_values();
 
 		measure_result = HP03S_ERROR;
 
@@ -88,13 +74,6 @@ TEST_GROUP(HP03S_Coefficients)
 	void testWithCoefficient(SensorCoefficient c, uint16_t value)
 	{
 		sensor_coefficients[c] = value;
-		create_result = HP03S_Create();
-		measure_result = HP03S_Measure();
-	}
-
-	void testWithParameter(SensorParameter p, uint8_t value)
-	{
-		sensor_parameters[p] = value;
 		create_result = HP03S_Create();
 		measure_result = HP03S_Measure();
 	}
@@ -211,72 +190,4 @@ TEST(HP03S_Coefficients, C7Max)
 
 	LONGS_EQUAL(-73, HP03S_GetTemperature());
 	LONGS_EQUAL(10018, HP03S_GetPressure());
-}
-
-TEST(HP03S_Coefficients, AMin)
-{
-	/* to test A we need a higher temperature that it has influence */
-	ad_temperature = 12345;
-	testWithParameter(SensorParameter_A, 1);
-
-	LONGS_EQUAL(433, HP03S_GetTemperature());
-	LONGS_EQUAL(11442, HP03S_GetPressure());
-}
-
-TEST(HP03S_Coefficients, AMax)
-{
-	/* to test A we need a higher temperature that it has influence */
-	ad_temperature = 12345;
-	testWithParameter(SensorParameter_A, 0x3F);
-
-	LONGS_EQUAL(295, HP03S_GetTemperature());
-	LONGS_EQUAL(11024, HP03S_GetPressure());
-}
-
-TEST(HP03S_Coefficients, BMin)
-{
-	testWithParameter(SensorParameter_B, 1);
-
-	LONGS_EQUAL(-55, HP03S_GetTemperature());
-	LONGS_EQUAL(9971, HP03S_GetPressure());
-}
-
-TEST(HP03S_Coefficients, BMax)
-{
-	testWithParameter(SensorParameter_B, 63);
-
-	LONGS_EQUAL(-415, HP03S_GetTemperature());
-	LONGS_EQUAL(8886, HP03S_GetPressure());
-}
-
-TEST(HP03S_Coefficients, CMin)
-{
-	testWithParameter(SensorParameter_C, 1);
-
-	LONGS_EQUAL(-235, HP03S_GetTemperature());
-	LONGS_EQUAL(9428, HP03S_GetPressure());
-}
-
-TEST(HP03S_Coefficients, CMax)
-{
-	testWithParameter(SensorParameter_C, 15);
-
-	LONGS_EQUAL(-50, HP03S_GetTemperature());
-	LONGS_EQUAL(9988, HP03S_GetPressure());
-}
-
-TEST(HP03S_Coefficients, DMin)
-{
-	testWithParameter(SensorParameter_D, 1);
-
-	LONGS_EQUAL(2656, HP03S_GetTemperature());
-	LONGS_EQUAL(9918, HP03S_GetPressure());
-}
-
-TEST(HP03S_Coefficients, DMax)
-{
-	testWithParameter(SensorParameter_D, 15);
-
-	LONGS_EQUAL(-83, HP03S_GetTemperature());
-	LONGS_EQUAL(9918, HP03S_GetPressure());
 }
