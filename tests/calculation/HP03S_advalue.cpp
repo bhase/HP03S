@@ -2,47 +2,7 @@
 
 extern "C"
 {
-#include "HP03S.h"
-#include "HP03S_internal.h"
-
-static uint16_t ad_temperature = 0;
-static uint16_t ad_pressure = 0;
-
-static uint16_t Mock_ReadPressure(void)
-{
-	return ad_pressure;
-}
-
-static uint16_t Mock_ReadTemperature(void)
-{
-	return ad_temperature;
-}
-
-static uint16_t Mock_ReadSensorCoefficient(SensorCoefficient coefficient)
-{
-	const uint16_t sensor_coefficients[7] = {
-		/* C1_SensitivityCoefficient */ 29908,
-		/* C2_OffsetCoefficient */ 3724,
-		/* C3_TemperatureCoefficientOfSensitivity */ 312,
-		/* C4_TemperatureCoefficientOfOffset */ 441,
-		/* C5_ReferenceTemperature */ 9191,
-		/* C6_TemperatureCoefficientOfTemperature */ 3990,
-		/* C7_OffsetFineTuning */ 2500,
-	};
-	return sensor_coefficients[coefficient];
-}
-
-static uint8_t Mock_ReadSensorParameter(SensorParameter param)
-{
-	const uint8_t sensor_parameters[4] = {
-		/* SensorParameter_A */ 1,
-		/* SensorParameter_B */ 4,
-		/* SensorParameter_C */ 4,
-		/* SensorParameter_D */ 9,
-	};
-	return sensor_parameters[param];
-}
-
+#include "stubs.h"
 }
 
 TEST_GROUP(HP03S)
@@ -50,15 +10,9 @@ TEST_GROUP(HP03S)
 
 	HP03S_Result measure_result;
 
-	void setup_default_ad_values(void)
-	{
-		ad_temperature = 4107;
-		ad_pressure = 30036;
-	}
-
 	void setup()
 	{
-		setup_default_ad_values();
+		Stub_SetupDefault();
 
 		measure_result = HP03S_ERROR;
 
@@ -130,7 +84,7 @@ TEST(HP03S, DataSheetExample)
 
 TEST(HP03S, TemperatureMin)
 {
-	ad_temperature = 0;
+	Stub_SetupRawTemperature(0);
 	measure_result = HP03S_Measure();
 
 	LONGS_EQUAL(-367, HP03S_GetTemperature());
@@ -139,7 +93,7 @@ TEST(HP03S, TemperatureMin)
 
 TEST(HP03S, TemperatureMax)
 {
-	ad_temperature = 0xFFFF;
+	Stub_SetupRawTemperature(0xFFFF);
 	measure_result = HP03S_Measure();
 
 	LONGS_EQUAL(2857, HP03S_GetTemperature());
@@ -148,7 +102,7 @@ TEST(HP03S, TemperatureMax)
 
 TEST(HP03S, PressureMin)
 {
-	ad_pressure = 0;
+	Stub_SetupRawPressure(0);
 	measure_result = HP03S_Measure();
 
 	LONGS_EQUAL(-73, HP03S_GetTemperature());
@@ -157,7 +111,7 @@ TEST(HP03S, PressureMin)
 
 TEST(HP03S, PressureMax)
 {
-	ad_pressure = 0xFFFF;
+	Stub_SetupRawPressure(0xFFFF);
 	measure_result = HP03S_Measure();
 
 	LONGS_EQUAL(-73, HP03S_GetTemperature());
