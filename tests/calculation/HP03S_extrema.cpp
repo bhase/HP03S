@@ -2,35 +2,7 @@
 
 extern "C"
 {
-#include "HP03S.h"
-#include "HP03S_internal.h"
-
-static uint16_t sensor_coefficients[7];
-static uint8_t sensor_parameters[4];
-
-static uint16_t ad_temperature = 0;
-static uint16_t ad_pressure = 0;
-
-static uint16_t Mock_ReadPressure(void)
-{
-	return ad_pressure;
-}
-
-static uint16_t Mock_ReadTemperature(void)
-{
-	return ad_temperature;
-}
-
-static uint16_t Mock_ReadSensorCoefficient(SensorCoefficient coefficient)
-{
-	return sensor_coefficients[coefficient];
-}
-
-static uint8_t Mock_ReadSensorParameter(SensorParameter param)
-{
-	return sensor_parameters[param];
-}
-
+#include "stubs.h"
 }
 
 
@@ -61,6 +33,7 @@ TEST_GROUP(HP03S_Extrema)
 TEST(HP03S_Extrema, MaximumValues)
 {
 	/* the parameter are chosen that the _result_ is maximal */
+	uint16_t sensor_coefficients[7];
 	sensor_coefficients[C1_SensitivityCoefficient] = 65535;
 	sensor_coefficients[C2_OffsetCoefficient] = 0;
 	sensor_coefficients[C3_TemperatureCoefficientOfSensitivity] = 1024;
@@ -68,14 +41,17 @@ TEST(HP03S_Extrema, MaximumValues)
 	sensor_coefficients[C5_ReferenceTemperature] = 4096;
 	sensor_coefficients[C6_TemperatureCoefficientOfTemperature] = 16384;
 	sensor_coefficients[C7_OffsetFineTuning] = 2600;
+	Stub_SetupCoefficients(sensor_coefficients);
 
+	uint8_t sensor_parameters[4];
 	sensor_parameters[SensorParameter_A] = 63;
 	sensor_parameters[SensorParameter_B] = 4; /* does not matter */
 	sensor_parameters[SensorParameter_C] = 1;
 	sensor_parameters[SensorParameter_D] = 1;
+	Stub_SetupParameters(sensor_parameters);
 
-	ad_temperature = 65535;
-	ad_pressure = 65535;
+	Stub_SetupRawTemperature(65535);
+	Stub_SetupRawPressure(65535);
 
 	create_result = HP03S_Create();
 	measure_result = HP03S_Measure();
@@ -87,6 +63,7 @@ TEST(HP03S_Extrema, MaximumValues)
 TEST(HP03S_Extrema, MinimumValues)
 {
 	/* the parameter are chosen that the _result_ is minimal */
+	uint16_t sensor_coefficients[7];
 	sensor_coefficients[C1_SensitivityCoefficient] = 256;
 	sensor_coefficients[C2_OffsetCoefficient] = 8191;
 	sensor_coefficients[C3_TemperatureCoefficientOfSensitivity] = 0;
@@ -94,14 +71,17 @@ TEST(HP03S_Extrema, MinimumValues)
 	sensor_coefficients[C5_ReferenceTemperature] = 65535;
 	sensor_coefficients[C6_TemperatureCoefficientOfTemperature] = 0;
 	sensor_coefficients[C7_OffsetFineTuning] = 2400;
+	Stub_SetupCoefficients(sensor_coefficients);
 
+	uint8_t sensor_parameters[4];
 	sensor_parameters[SensorParameter_A] = 1; /* does not matter */
 	sensor_parameters[SensorParameter_B] = 1;
 	sensor_parameters[SensorParameter_C] = 15;
 	sensor_parameters[SensorParameter_D] = 15;
+	Stub_SetupParameters(sensor_parameters);
 
-	ad_temperature = 0;
-	ad_pressure = 0;
+	Stub_SetupRawTemperature(0);
+	Stub_SetupRawPressure(0);
 
 	create_result = HP03S_Create();
 	measure_result = HP03S_Measure();
