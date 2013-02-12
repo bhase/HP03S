@@ -2,42 +2,7 @@
 
 extern "C"
 {
-#include "HP03S.h"
-#include "HP03S_internal.h"
-
-static uint8_t sensor_parameters[4];
-
-static uint16_t ad_temperature = 0;
-
-static uint16_t Mock_ReadPressure(void)
-{
-	return 30036;
-}
-
-static uint16_t Mock_ReadTemperature(void)
-{
-	return ad_temperature;
-}
-
-static uint16_t Mock_ReadSensorCoefficient(SensorCoefficient coefficient)
-{
-	const uint16_t sensor_coefficients[7] = {
-		 /* C1_SensitivityCoefficient */ 29908,
-		 /* C2_OffsetCoefficient */ 3724,
-		 /* C3_TemperatureCoefficientOfSensitivity */ 312,
-		 /* C4_TemperatureCoefficientOfOffset */ 441,
-		 /* C5_ReferenceTemperature */ 9191,
-		 /* C6_TemperatureCoefficientOfTemperature */ 3990,
-		 /* C7_OffsetFineTuning */ 2500,
-	};
-	return sensor_coefficients[coefficient];
-}
-
-static uint8_t Mock_ReadSensorParameter(SensorParameter param)
-{
-	return sensor_parameters[param];
-}
-
+#include "stubs.h"
 }
 
 
@@ -45,6 +10,8 @@ TEST_GROUP(HP03S_Parameter)
 {
 	HP03S_Result measure_result;
 	HP03S_Result create_result;
+	uint8_t sensor_parameters[4];
+	uint16_t ad_temperature;
 
 	void setup_default_parameter(void)
 	{
@@ -54,15 +21,11 @@ TEST_GROUP(HP03S_Parameter)
 		sensor_parameters[SensorParameter_D] = 9;
 	}
 
-	void setup_default_ad_values(void)
-	{
-		ad_temperature = 4107;
-	}
-
 	void setup()
 	{
+		Stub_SetupDefault();
 		setup_default_parameter();
-		setup_default_ad_values();
+		ad_temperature = 4107;
 
 		measure_result = HP03S_ERROR;
 
@@ -82,6 +45,9 @@ TEST_GROUP(HP03S_Parameter)
 	void testWithParameter(SensorParameter p, uint8_t value)
 	{
 		sensor_parameters[p] = value;
+		Stub_SetupParameters(sensor_parameters);
+		Stub_SetupRawTemperature(ad_temperature);
+
 		create_result = HP03S_Create();
 		measure_result = HP03S_Measure();
 	}
