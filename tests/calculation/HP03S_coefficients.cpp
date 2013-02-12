@@ -2,37 +2,7 @@
 
 extern "C"
 {
-#include "HP03S.h"
-#include "HP03S_internal.h"
-
-static uint16_t sensor_coefficients[7];
-
-static uint16_t Mock_ReadPressure(void)
-{
-	return 30036;
-}
-
-static uint16_t Mock_ReadTemperature(void)
-{
-	return 4107;
-}
-
-static uint16_t Mock_ReadSensorCoefficient(SensorCoefficient coefficient)
-{
-	return sensor_coefficients[coefficient];
-}
-
-static uint8_t Mock_ReadSensorParameter(SensorParameter param)
-{
-	const uint8_t sensor_parameters[4] = {
-		/* SensorParameter_A */ 1,
-		/* SensorParameter_B */ 4,
-		/* SensorParameter_C */ 4,
-		/* SensorParameter_D */ 9,
-	};
-	return sensor_parameters[param];
-}
-
+#include "stubs.h"
 }
 
 
@@ -40,6 +10,8 @@ TEST_GROUP(HP03S_Coefficients)
 {
 	HP03S_Result measure_result;
 	HP03S_Result create_result;
+
+	uint16_t sensor_coefficients[7];
 
 	void setup_default_coefficients(void)
 	{
@@ -54,6 +26,7 @@ TEST_GROUP(HP03S_Coefficients)
 
 	void setup()
 	{
+		Stub_SetupDefault();
 		setup_default_coefficients();
 
 		measure_result = HP03S_ERROR;
@@ -74,6 +47,7 @@ TEST_GROUP(HP03S_Coefficients)
 	void testWithCoefficient(SensorCoefficient c, uint16_t value)
 	{
 		sensor_coefficients[c] = value;
+		Stub_SetupCoefficients(sensor_coefficients);
 		create_result = HP03S_Create();
 		measure_result = HP03S_Measure();
 	}
