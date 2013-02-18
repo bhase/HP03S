@@ -22,14 +22,16 @@ static const uint8_t *sensor_parameters = default_sensor_parameters;
 static uint16_t ad_temperature = 4107;
 static uint16_t ad_pressure = 30036;
 
-uint16_t Mock_ReadPressure(void)
+HP03S_Result Mock_ReadPressure(uint16_t *val)
 {
-	return ad_pressure;
+	*val = ad_pressure;
+	return HP03S_OK;
 }
 
-uint16_t Mock_ReadTemperature(void)
+HP03S_Result Mock_ReadTemperature(uint16_t *val)
 {
-	return ad_temperature;
+	*val = ad_temperature;
+	return HP03S_OK;
 }
 
 uint16_t Mock_ReadSensorCoefficient(SensorCoefficient coefficient)

@@ -12,12 +12,12 @@ static uint8_t HP03S_ReadSensorParameterImpl(SensorParameter parameter)
 	return 0;
 }
 
-static uint16_t HP03S_ReadTemperatureImpl(void)
+static HP03S_Result HP03S_ReadTemperatureImpl(uint16_t *val)
 {
 	return 0;
 }
 
-static uint16_t HP03S_ReadPressureImpl(void)
+static HP03S_Result HP03S_ReadPressureImpl(uint16_t *val)
 {
 	return 0;
 }
@@ -29,5 +29,5 @@ uint16_t (*HP03S_ReadSensorCoefficient)(SensorCoefficient coefficient) =
 uint8_t (*HP03S_ReadSensorParameter)(SensorParameter parameter) =
 	HP03S_ReadSensorParameterImpl;
 
-uint16_t (*HP03S_ReadTemperature)(void) = HP03S_ReadTemperatureImpl;
-uint16_t (*HP03S_ReadPressure)(void) = HP03S_ReadPressureImpl;
+HP03S_Result (*HP03S_ReadTemperature)(uint16_t *val) = HP03S_ReadTemperatureImpl;
+HP03S_Result (*HP03S_ReadPressure)(uint16_t *val) = HP03S_ReadPressureImpl;

@@ -86,8 +86,8 @@ HP03S_Result HP03S_Measure(void)
 		return HP03S_UNINITIALIZED;
 
 	GPIO_SetXCLR_High();
-	measured_temperature = HP03S_ReadTemperature();
-	measured_pressure = HP03S_ReadPressure();
+	HP03S_ReadTemperature(&measured_temperature);
+	HP03S_ReadPressure(&measured_pressure);
 	GPIO_SetXCLR_Low();
 
 	int temperature_distance  = measured_temperature - sensor_coefficients.C5;

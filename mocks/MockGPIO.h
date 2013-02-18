@@ -2,6 +2,7 @@
 #define D_MockGPIO_H
 
 #include "GPIO.h"
+#include "HP03S.h"
 #include "HP03S_internal.h"
 
 void MockGPIO_Create(unsigned int maxExpectations);

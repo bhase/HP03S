@@ -5,7 +5,9 @@
 
 /**********************************************************
  *
- * HP03S is responsible for ...
+ * HP03S is a library for the Hope pressure sensor.
+ * It requires a GPIO pin and an I2C interface
+ * (see I2C.h and GPIO.h for details)
  *
  **********************************************************/
 

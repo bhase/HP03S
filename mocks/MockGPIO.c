@@ -2,10 +2,10 @@
 #include "CppUTest/TestHarness_c.h"
 #include <stdio.h>
 
-static uint16_t Mock_ReadPressure(void);
-static uint16_t (*saved_ReadPressure)(void);
-static uint16_t Mock_ReadTemperature(void);
-static uint16_t (*saved_ReadTemperature)(void);
+static HP03S_Result Mock_ReadPressure(uint16_t *val);
+static HP03S_Result (*saved_ReadPressure)(uint16_t *val);
+static HP03S_Result Mock_ReadTemperature(uint16_t *val);
+static HP03S_Result (*saved_ReadTemperature)(uint16_t *val);
 
 static uint8_t (*saved_ReadSensorParameter)(SensorParameter param);
 static uint8_t Mock_ReadSensorParameter(SensorParameter param);
@@ -139,20 +139,20 @@ void MockGPIO_CheckExpectations(void)
  * mock the functions to read AD values
  */
 
-static uint16_t Mock_ReadPressure(void)
+static HP03S_Result Mock_ReadPressure(uint16_t *val)
 {
 	if (expectations[checked_expectations].type != AD_READ)
 		fail(unexpected_pressure_read);
 	checked_expectations++;
-	return 0;
+	return HP03S_OK;
 }
 
-static uint16_t Mock_ReadTemperature(void)
+static HP03S_Result Mock_ReadTemperature(uint16_t *val)
 {
 	if (expectations[checked_expectations].type != AD_READ)
 		fail(unexpected_temperature_read);
 	checked_expectations++;
-	return 0;
+	return HP03S_OK;
 }
 
 /*

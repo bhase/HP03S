@@ -5,8 +5,8 @@
 #include "HP03S.h"
 #include "HP03S_internal.h"
 
-uint16_t Mock_ReadPressure(void);
-uint16_t Mock_ReadTemperature(void);
+HP03S_Result Mock_ReadPressure(uint16_t *val);
+HP03S_Result Mock_ReadTemperature(uint16_t *val);
 uint16_t Mock_ReadSensorCoefficient(SensorCoefficient coefficient);
 uint8_t Mock_ReadSensorParameter(SensorParameter param);
 
