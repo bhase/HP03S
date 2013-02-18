@@ -34,14 +34,22 @@ HP03S_Result Mock_ReadTemperature(uint16_t *val)
 	return HP03S_OK;
 }
 
-uint16_t Mock_ReadSensorCoefficient(SensorCoefficient coefficient)
+HP03S_Result Mock_ReadSensorCoefficient(uint16_t *coefficient)
 {
-	return sensor_coefficients[coefficient];
+	int i;
+	for (i = 0; i < 7; i++) {
+		coefficient[i] = sensor_coefficients[i];
+	}
+	return HP03S_OK;
 }
 
-uint8_t Mock_ReadSensorParameter(SensorParameter param)
+HP03S_Result Mock_ReadSensorParameter(uint8_t *param)
 {
-	return sensor_parameters[param];
+	int i;
+	for (i = 0; i < 4; i++) {
+		param[i] = sensor_parameters[i];
+	}
+	return HP03S_OK;
 }
 
 

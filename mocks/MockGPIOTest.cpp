@@ -39,6 +39,9 @@ TEST_GROUP(MockGPIO)
 static void CanMatchExpectations(void)
 {
 	uint16_t dummy;
+	uint16_t dummyCoefficients[7];
+	uint8_t dummyParameter[4];
+
 	MockGPIO_Expect_SetXCLR_High();
 	MockGPIO_Expect_nTimesADRead(2);
 	MockGPIO_Expect_nTimesEERead(2);
@@ -47,8 +50,8 @@ static void CanMatchExpectations(void)
 	GPIO_SetXCLR_High();
 	HP03S_ReadPressure(&dummy);
 	HP03S_ReadTemperature(&dummy);
-	HP03S_ReadSensorParameter(SensorParameter_A);
-	HP03S_ReadSensorCoefficient(C1_SensitivityCoefficient);
+	HP03S_ReadSensorParameter(dummyParameter);
+	HP03S_ReadSensorCoefficient(dummyCoefficients);
 	GPIO_SetXCLR_Low();
 
 	MockGPIO_CheckExpectations();
@@ -187,8 +190,9 @@ TEST(MockGPIO, GPIO_DoesNotFailWithoutInit)
 
 static void FailOnUnexpectedParameterRead(void)
 {
+	uint8_t dummyParameter[4];
 	MockGPIO_Expect_SetXCLR_High();
-	HP03S_ReadSensorParameter(SensorParameter_A);
+	HP03S_ReadSensorParameter(dummyParameter);
 }
 
 TEST(MockGPIO, FailOnUnexpectedParameterRead)

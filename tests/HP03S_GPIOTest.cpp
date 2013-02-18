@@ -39,7 +39,7 @@ TEST(HP03S_GPIO, Measure)
 TEST(HP03S_GPIO, Init)
 {
 	MockGPIO_Expect_SetXCLR_Low();
-	MockGPIO_Expect_nTimesEERead(11);
+	MockGPIO_Expect_nTimesEERead(2);
 
 	HP03S_Create();
 }

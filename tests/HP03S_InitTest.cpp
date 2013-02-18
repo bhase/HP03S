@@ -8,18 +8,16 @@ extern "C"
 
 #include "CppUTestExt/MockSupport_c.h"
 
-static uint16_t Mock_HP03S_ReadSensorCoefficient(SensorCoefficient coefficient)
+static HP03S_Result Mock_HP03S_ReadSensorCoefficient(uint16_t *coefficient)
 {
-	mock_c()->actualCall("HP03S_ReadSensorCoefficient")
-		->withIntParameters("coefficient", coefficient);
-	return 0;
+	mock_c()->actualCall("HP03S_ReadSensorCoefficient");
+	return HP03S_OK;
 }
 
-static uint8_t Mock_HP03S_ReadSensorParameter(SensorParameter parameter)
+static HP03S_Result Mock_HP03S_ReadSensorParameter(uint8_t *parameter)
 {
-	mock_c()->actualCall("HP03S_ReadSensorParameter")
-		->withIntParameters("parameter", parameter);
-	return 0;
+	mock_c()->actualCall("HP03S_ReadSensorParameter");
+	return HP03S_OK;
 }
 
 } /* extern "C" */
@@ -50,29 +48,8 @@ TEST_GROUP(HP03S_Init)
 
 TEST(HP03S_Init, Create)
 {
-	mock_c()->expectOneCall("HP03S_ReadSensorCoefficient")
-		->withIntParameters("coefficient", C1_SensitivityCoefficient);
-	mock_c()->expectOneCall("HP03S_ReadSensorCoefficient")
-		->withIntParameters("coefficient", C2_OffsetCoefficient);
-	mock_c()->expectOneCall("HP03S_ReadSensorCoefficient")
-		->withIntParameters("coefficient", C3_TemperatureCoefficientOfSensitivity);
-	mock_c()->expectOneCall("HP03S_ReadSensorCoefficient")
-		->withIntParameters("coefficient", C4_TemperatureCoefficientOfOffset);
-	mock_c()->expectOneCall("HP03S_ReadSensorCoefficient")
-		->withIntParameters("coefficient", C5_ReferenceTemperature);
-	mock_c()->expectOneCall("HP03S_ReadSensorCoefficient")
-		->withIntParameters("coefficient", C6_TemperatureCoefficientOfTemperature);
-	mock_c()->expectOneCall("HP03S_ReadSensorCoefficient")
-		->withIntParameters("coefficient", C7_OffsetFineTuning);
-
-	mock_c()->expectOneCall("HP03S_ReadSensorParameter")
-		->withIntParameters("parameter", SensorParameter_A);
-	mock_c()->expectOneCall("HP03S_ReadSensorParameter")
-		->withIntParameters("parameter", SensorParameter_B);
-	mock_c()->expectOneCall("HP03S_ReadSensorParameter")
-		->withIntParameters("parameter", SensorParameter_C);
-	mock_c()->expectOneCall("HP03S_ReadSensorParameter")
-		->withIntParameters("parameter", SensorParameter_D);
+	mock_c()->expectOneCall("HP03S_ReadSensorCoefficient");
+	mock_c()->expectOneCall("HP03S_ReadSensorParameter");
 
 	init_result = HP03S_Create();
 }

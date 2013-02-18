@@ -7,8 +7,8 @@
 
 HP03S_Result Mock_ReadPressure(uint16_t *val);
 HP03S_Result Mock_ReadTemperature(uint16_t *val);
-uint16_t Mock_ReadSensorCoefficient(SensorCoefficient coefficient);
-uint8_t Mock_ReadSensorParameter(SensorParameter param);
+HP03S_Result Mock_ReadSensorCoefficient(uint16_t *coefficient);
+HP03S_Result Mock_ReadSensorParameter(uint8_t *param);
 
 void Stub_SetupDefault(void);
 void Stub_SetupRawTemperature(uint16_t temperature);

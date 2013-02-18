@@ -34,27 +34,24 @@ static enum {
 
 HP03S_Result HP03S_Create(void)
 {
+	uint16_t coefficients[7];
+	uint8_t parameter[4];
+
 	GPIO_SetXCLR_Low();
 
-	sensor_coefficients.C1 =
-		HP03S_ReadSensorCoefficient(C1_SensitivityCoefficient);
-	sensor_coefficients.C2 =
-	       HP03S_ReadSensorCoefficient(C2_OffsetCoefficient);
-	sensor_coefficients.C3 =
-	       HP03S_ReadSensorCoefficient(C3_TemperatureCoefficientOfSensitivity);
-	sensor_coefficients.C4 =
-	       HP03S_ReadSensorCoefficient(C4_TemperatureCoefficientOfOffset);
-	sensor_coefficients.C5 =
-	       HP03S_ReadSensorCoefficient(C5_ReferenceTemperature);
-	sensor_coefficients.C6 =
-	       HP03S_ReadSensorCoefficient(C6_TemperatureCoefficientOfTemperature);
-	sensor_coefficients.C7 =
-	       HP03S_ReadSensorCoefficient(C7_OffsetFineTuning);
-
-	sensor_parameters.A = HP03S_ReadSensorParameter(SensorParameter_A);
-	sensor_parameters.B = HP03S_ReadSensorParameter(SensorParameter_B);
-	sensor_parameters.C = HP03S_ReadSensorParameter(SensorParameter_C);
-	sensor_parameters.D = HP03S_ReadSensorParameter(SensorParameter_D);
+	HP03S_ReadSensorParameter(parameter);
+	HP03S_ReadSensorCoefficient(coefficients);
+	sensor_coefficients.C1 = coefficients[C1_SensitivityCoefficient];
+	sensor_coefficients.C2 = coefficients[C2_OffsetCoefficient];
+	sensor_coefficients.C3 = coefficients[C3_TemperatureCoefficientOfSensitivity];
+	sensor_coefficients.C4 = coefficients[C4_TemperatureCoefficientOfOffset];
+	sensor_coefficients.C5 = coefficients[C5_ReferenceTemperature];
+	sensor_coefficients.C6 = coefficients[C6_TemperatureCoefficientOfTemperature];
+	sensor_coefficients.C7 = coefficients[C7_OffsetFineTuning];
+	sensor_parameters.A = parameter[SensorParameter_A];
+	sensor_parameters.B = parameter[SensorParameter_B];
+	sensor_parameters.C = parameter[SensorParameter_C];
+	sensor_parameters.D = parameter[SensorParameter_D];
 
 	module_state = Ready;
 	return HP03S_OK;
@@ -79,8 +76,8 @@ Pressure HP03S_GetPressure(void)
 
 HP03S_Result HP03S_Measure(void)
 {
-	uint16_t measured_temperature;
-	uint16_t measured_pressure;
+	uint16_t measured_temperature = 4107;
+	uint16_t measured_pressure = 30036;
 
 	if (module_state == UnInitialized)
 		return HP03S_UNINITIALIZED;

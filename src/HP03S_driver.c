@@ -2,14 +2,14 @@
 #include "HP03S.h"
 #include "HP03S_internal.h"
 
-static uint16_t HP03S_ReadSensorCoefficientImpl(SensorCoefficient coefficient)
+static HP03S_Result HP03S_ReadSensorCoefficientImpl(uint16_t *coefficient)
 {
-	return 0;
+	return HP03S_OK;
 }
 
-static uint8_t HP03S_ReadSensorParameterImpl(SensorParameter parameter)
+static HP03S_Result HP03S_ReadSensorParameterImpl(uint8_t *parameter)
 {
-	return 0;
+	return HP03S_OK;
 }
 
 static HP03S_Result HP03S_ReadTemperatureImpl(uint16_t *val)
@@ -23,10 +23,10 @@ static HP03S_Result HP03S_ReadPressureImpl(uint16_t *val)
 }
 
 
-uint16_t (*HP03S_ReadSensorCoefficient)(SensorCoefficient coefficient) =
+HP03S_Result (*HP03S_ReadSensorCoefficient)(uint16_t *coefficient) =
 	HP03S_ReadSensorCoefficientImpl;
 
-uint8_t (*HP03S_ReadSensorParameter)(SensorParameter parameter) =
+HP03S_Result (*HP03S_ReadSensorParameter)(uint8_t *parameter) =
 	HP03S_ReadSensorParameterImpl;
 
 HP03S_Result (*HP03S_ReadTemperature)(uint16_t *val) = HP03S_ReadTemperatureImpl;

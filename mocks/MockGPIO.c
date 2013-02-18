@@ -7,10 +7,10 @@ static HP03S_Result (*saved_ReadPressure)(uint16_t *val);
 static HP03S_Result Mock_ReadTemperature(uint16_t *val);
 static HP03S_Result (*saved_ReadTemperature)(uint16_t *val);
 
-static uint8_t (*saved_ReadSensorParameter)(SensorParameter param);
-static uint8_t Mock_ReadSensorParameter(SensorParameter param);
-static uint16_t (*saved_ReadSensorCoefficient)(SensorCoefficient coefficient);
-static uint16_t Mock_ReadSensorCoefficient(SensorCoefficient coefficient);
+static HP03S_Result (*saved_ReadSensorParameter)(uint8_t *param);
+static HP03S_Result Mock_ReadSensorParameter(uint8_t *param);
+static HP03S_Result (*saved_ReadSensorCoefficient)(uint16_t *coefficient);
+static HP03S_Result Mock_ReadSensorCoefficient(uint16_t *coefficient);
 
 static unsigned int used_expectations = 0;
 static unsigned int max_expectations = 0;
@@ -159,20 +159,33 @@ static HP03S_Result Mock_ReadTemperature(uint16_t *val)
  * mock the sensor parameter read functions
  */
 
-static uint8_t Mock_ReadSensorParameter(SensorParameter param)
+static HP03S_Result Mock_ReadSensorParameter(uint8_t *param)
 {
+	param[SensorParameter_A] = 1;
+	param[SensorParameter_B] = 4;
+	param[SensorParameter_C] = 4;
+	param[SensorParameter_D] = 9;
+
 	if (expectations[checked_expectations].type != EE_READ)
 		fail(unexpected_parameter_read);
 	checked_expectations++;
-	return 0;
+	return HP03S_OK;
 }
 
-static uint16_t Mock_ReadSensorCoefficient(SensorCoefficient coefficient)
+static HP03S_Result Mock_ReadSensorCoefficient(uint16_t *coefficient)
 {
+	coefficient[C1_SensitivityCoefficient] = 29908;
+	coefficient[C2_OffsetCoefficient] = 3724;
+	coefficient[C3_TemperatureCoefficientOfSensitivity] = 312;
+	coefficient[C4_TemperatureCoefficientOfOffset] = 441;
+	coefficient[C5_ReferenceTemperature] = 9191;
+	coefficient[C6_TemperatureCoefficientOfTemperature] = 3990;
+	coefficient[C7_OffsetFineTuning] = 2500;
+
 	if (expectations[checked_expectations].type != EE_READ)
 		fail(unexpected_coefficient_read);
 	checked_expectations++;
-	return 0;
+	return HP03S_OK;
 }
 
 /*       _\|/_
