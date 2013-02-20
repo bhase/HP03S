@@ -25,15 +25,20 @@ TEST_GROUP(HP03S_I2CParameter)
 	{
 		memset(expected_parameter, 0xAA, sizeof(expected_parameter));
 		memset(returned_parameter, 0x01, sizeof(returned_parameter));
-		MockI2C_Create(3);
+
+		output_buffer[0] = ParameterStartAddress;
+
 		result = HP03S_ERROR;
 		expected_result = HP03S_OK;
+
+		MockI2C_Create(3);
 	}
 
 	void teardown(void)
 	{
 		MockI2C_CheckExpectations();
 		MockI2C_Destroy();
+
 		LONGS_EQUAL(expected_result, result);
 	}
 };
@@ -49,8 +54,6 @@ TEST(HP03S_I2CParameter, ReadOk)
 	 * I2C stop
 	 * => I2C_Run()
 	 */
-	output_buffer[0] = ParameterStartAddress;
-
 	MockI2C_Expect_I2C_WriteTo_and_check_buffer(EEPROM_DeviceAddress,
 						    1, output_buffer);
 	MockI2C_Expect_I2C_ReadFrom_and_fill_buffer(EEPROM_DeviceAddress,
@@ -61,4 +64,16 @@ TEST(HP03S_I2CParameter, ReadOk)
 	CHECK(memcmp(expected_parameter,
 		     returned_parameter,
 		     sizeof(expected_parameter)) == 0);
+}
+
+TEST(HP03S_I2CParameter, NoResponse)
+{
+	expected_result = HP03S_NoDevice;
+	MockI2C_Expect_I2C_WriteTo_and_check_buffer(EEPROM_DeviceAddress,
+						    1, output_buffer);
+	MockI2C_Expect_I2C_ReadFrom_and_fill_buffer(EEPROM_DeviceAddress,
+						    4, expected_parameter);
+	MockI2C_Expect_I2C_Run_and_return(I2C_Timeout);
+
+	result = HP03S_ReadSensorParameter(returned_parameter);
 }

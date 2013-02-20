@@ -16,6 +16,7 @@ typedef int Pressure;
 
 typedef enum {
 	HP03S_OK = 0,
+	HP03S_NoDevice,
 	HP03S_UNINITIALIZED,
 	HP03S_ERROR,
 } HP03S_Result;

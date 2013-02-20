@@ -13,7 +13,10 @@ static HP03S_Result HP03S_ReadSensorParameterImpl(uint8_t *parameter)
 	uint8_t command[1] = { 0x1E };
 	I2C_WriteTo(0xA0, 1, command);
 	I2C_ReadFrom(0xA0, 4, parameter);
-	return I2C_Run();
+	I2C_Result result = I2C_Run();
+	if (result == I2C_Timeout)
+		return HP03S_NoDevice;
+	return result;
 }
 
 static HP03S_Result HP03S_ReadTemperatureImpl(uint16_t *val)
