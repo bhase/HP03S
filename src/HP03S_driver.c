@@ -1,6 +1,7 @@
 
 #include "HP03S.h"
 #include "HP03S_internal.h"
+#include "I2C.h"
 
 static HP03S_Result HP03S_ReadSensorCoefficientImpl(uint16_t *coefficient)
 {
@@ -9,7 +10,10 @@ static HP03S_Result HP03S_ReadSensorCoefficientImpl(uint16_t *coefficient)
 
 static HP03S_Result HP03S_ReadSensorParameterImpl(uint8_t *parameter)
 {
-	return HP03S_OK;
+	uint8_t command[1] = { 0x1E };
+	I2C_WriteTo(0xA0, 1, command);
+	I2C_ReadFrom(0xA0, 4, parameter);
+	return I2C_Run();
 }
 
 static HP03S_Result HP03S_ReadTemperatureImpl(uint16_t *val)
