@@ -9,8 +9,10 @@ typedef enum {
 	I2C_Timeout,
 } I2C_Result;
 
-void I2C_ReadFrom(uint16_t device_address, uint8_t length, uint8_t *buffer);
-void I2C_WriteTo(uint16_t device_address, uint8_t length, uint8_t *buffer);
+typedef uint16_t I2C_Address;
+
+void I2C_ReadFrom(I2C_Address device_address, uint8_t length, uint8_t *buffer);
+void I2C_WriteTo(I2C_Address device_address, uint8_t length, uint8_t *buffer);
 I2C_Result I2C_Run();
 
 #endif

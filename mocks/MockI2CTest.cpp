@@ -10,7 +10,7 @@ extern "C"
 #include "CppUTest/TestTestingFixture.h"
 #include "CppUTest/PlatformSpecificFunctions.h"
 
-static uint16_t device_address;
+static I2C_Address device_address;
 static uint8_t buffer[4];
 
 TEST_GROUP(MockI2C)

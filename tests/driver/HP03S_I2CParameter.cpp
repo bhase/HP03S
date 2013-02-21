@@ -18,7 +18,7 @@ TEST_GROUP(HP03S_I2CParameter)
 	uint8_t expected_parameter[4];
 	uint8_t returned_parameter[4];
 
-	static const uint16_t EEPROM_DeviceAddress = 0xA0;
+	static const I2C_Address EEPROM_DeviceAddress = 0xA0;
 	static const uint8_t ParameterStartAddress = 0x1E;
 
 	void setup(void)

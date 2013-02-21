@@ -12,7 +12,7 @@ typedef enum {
 
 typedef struct {
 	ExpectationType expectation_type;
-	uint16_t address;
+	I2C_Address address;
 	I2C_Result returnValue;
 	uint8_t length;
 	uint8_t *buffer;
@@ -69,7 +69,7 @@ static void failWhenNotInitialized(void)
 }
 
 
-static void failWhenRecordedAddressIsNot(uint16_t device_address)
+static void failWhenRecordedAddressIsNot(I2C_Address device_address)
 {
 	if (expectations[last_used_expectation].address != device_address) {
 		FAIL_TEXT_C("device address mismatch");
@@ -104,7 +104,7 @@ static void recordExpectation(ExpectationType type, ...)
 		expectations[last_recorded_expectation].returnValue = res;
 	}
 	else {
-		uint16_t address = (uint16_t)va_arg(ap, int);
+		I2C_Address address = (uint16_t)va_arg(ap, int);
 		uint8_t len = (uint8_t)va_arg(ap, int);
 		uint8_t *buf = (uint8_t *)va_arg(ap, uint8_t *);
 
@@ -139,7 +139,7 @@ void MockI2C_Destroy(void)
 }
 
 
-void MockI2C_Expect_I2C_ReadFrom_and_fill_buffer(uint16_t device_address,
+void MockI2C_Expect_I2C_ReadFrom_and_fill_buffer(I2C_Address device_address,
 						 uint8_t len,
 						 const uint8_t *buffer)
 {
@@ -148,7 +148,7 @@ void MockI2C_Expect_I2C_ReadFrom_and_fill_buffer(uint16_t device_address,
 	recordExpectation(I2C_READ, device_address, len, buffer);
 }
 
-void MockI2C_Expect_I2C_WriteTo_and_check_buffer(uint16_t device_address,
+void MockI2C_Expect_I2C_WriteTo_and_check_buffer(I2C_Address device_address,
 						 uint8_t len,
 						 const uint8_t *buffer)
 {
@@ -172,7 +172,7 @@ void MockI2C_CheckExpectations(void)
 
 /* I2C dummy implementation */
 
-void I2C_ReadFrom(uint16_t device_address, uint8_t length, uint8_t *buffer)
+void I2C_ReadFrom(I2C_Address device_address, uint8_t length, uint8_t *buffer)
 {
 	failWhenAllrecordedExpectationsUsed();
 	failWhenExpectationIsNot(I2C_READ, unexpected_read);
@@ -182,7 +182,7 @@ void I2C_ReadFrom(uint16_t device_address, uint8_t length, uint8_t *buffer)
 	last_used_expectation++;
 }
 
-void I2C_WriteTo(uint16_t device_address, uint8_t length, uint8_t *buffer)
+void I2C_WriteTo(I2C_Address device_address, uint8_t length, uint8_t *buffer)
 {
 	failWhenAllrecordedExpectationsUsed();
 	failWhenExpectationIsNot(I2C_WRITE, unexpected_write);
