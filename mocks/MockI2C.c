@@ -71,7 +71,7 @@ static void failWhenNotInitialized(void)
 
 static void failWhenRecordedAddressIsNot(I2C_Address device_address)
 {
-	if (expectations[last_used_expectation].address != device_address) {
+	if ((expectations[last_used_expectation].address | 1) != (device_address | 1)) {
 		FAIL_TEXT_C("device address mismatch");
 	}
 }

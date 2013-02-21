@@ -64,6 +64,20 @@ TEST(MockI2C, CanMatchExpectations)
 }
 
 
+static void I2C_Read_IgnoresLowBitInAddress(void)
+{
+	MockI2C_Expect_I2C_ReadFrom_and_fill_buffer((device_address | 1), 1, buffer);
+	I2C_ReadFrom((I2C_Address)(device_address & ~1), 1, buffer);
+}
+
+TEST(MockI2C, I2C_Read_IgnoresLowBitInAddress)
+{
+	expectedErrors = 0;
+	testFailureWith(I2C_Read_IgnoresLowBitInAddress);
+	fixture->assertPrintContains("OK");
+}
+
+
 static void WriteWhenReadExpectedFails(void)
 {
 	MockI2C_Expect_I2C_ReadFrom_and_fill_buffer(device_address, 1, buffer);
