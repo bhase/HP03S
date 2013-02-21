@@ -5,6 +5,10 @@
 
 static HP03S_Result HP03S_ReadSensorCoefficientImpl(uint16_t *coefficient)
 {
+	uint8_t command[1] = { 0x10 };
+	I2C_WriteTo(0xA0, 1, command);
+	I2C_ReadFrom(0xA0, 14, (uint8_t *)coefficient);
+	I2C_Run();
 	return HP03S_OK;
 }
 
