@@ -66,3 +66,16 @@ TEST(HP03S_I2CCoefficients, ReadOk)
 		     returned_coefficients,
 		     sizeof(expected_coefficients)) == 0);
 }
+
+TEST(HP03S_I2CCoefficients, NoResponse)
+{
+	expected_result = HP03S_NoDevice;
+	MockI2C_Expect_I2C_WriteTo_and_check_buffer(EEPROM_DeviceAddress,
+						    1, EEPROM_CellAddress);
+	MockI2C_Expect_I2C_ReadFrom_and_fill_buffer(EEPROM_DeviceAddress,
+						    14,
+						    (uint8_t *)expected_coefficients);
+	MockI2C_Expect_I2C_Run_and_return(I2C_Timeout);
+
+	result = HP03S_ReadSensorCoefficient(returned_coefficients);
+}
