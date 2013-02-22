@@ -4,13 +4,21 @@
 #include "I2C.h"
 
 static const I2C_Address EEPROM_DeviceAddress = 0xA0;
+static const uint8_t CoefficientStartAddress = 0x10;
+static const uint8_t ParameterStartAddress = 0x1E;
+
+static I2C_Result read_from_eeprom(uint8_t address, uint8_t length, uint8_t *buffer)
+{
+	uint8_t eeprom_cell_address[1] = { address };
+	I2C_WriteTo(EEPROM_DeviceAddress, 1, eeprom_cell_address);
+	I2C_ReadFrom(EEPROM_DeviceAddress, length, buffer);
+	return I2C_Run();
+}
 
 static HP03S_Result HP03S_ReadSensorCoefficientImpl(uint16_t *coefficient)
 {
-	uint8_t eeprom_cell_address[1] = { 0x10 };
-	I2C_WriteTo(EEPROM_DeviceAddress, 1, eeprom_cell_address);
-	I2C_ReadFrom(EEPROM_DeviceAddress, 14, (uint8_t *)coefficient);
-	I2C_Result result = I2C_Run();
+	I2C_Result result = read_from_eeprom(CoefficientStartAddress,
+					     14, (uint8_t *)coefficient);
 	if (result == I2C_Timeout)
 		return HP03S_NoDevice;
 	return result;
@@ -18,10 +26,8 @@ static HP03S_Result HP03S_ReadSensorCoefficientImpl(uint16_t *coefficient)
 
 static HP03S_Result HP03S_ReadSensorParameterImpl(uint8_t *parameter)
 {
-	uint8_t eeprom_cell_address[1] = { 0x1E };
-	I2C_WriteTo(EEPROM_DeviceAddress, 1, eeprom_cell_address);
-	I2C_ReadFrom(EEPROM_DeviceAddress, 4, parameter);
-	I2C_Result result = I2C_Run();
+	I2C_Result result = read_from_eeprom(ParameterStartAddress,
+					     4, parameter);
 	if (result == I2C_Timeout)
 		return HP03S_NoDevice;
 	return result;
