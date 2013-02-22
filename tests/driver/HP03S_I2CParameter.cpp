@@ -14,7 +14,7 @@ TEST_GROUP(HP03S_I2CParameter)
 {
 	HP03S_Result result;
 	HP03S_Result expected_result;
-	uint8_t output_buffer[1];
+	uint8_t eeprom_cell_address[1];
 	uint8_t expected_parameter[4];
 	uint8_t returned_parameter[4];
 
@@ -26,7 +26,7 @@ TEST_GROUP(HP03S_I2CParameter)
 		memset(expected_parameter, 0xAA, sizeof(expected_parameter));
 		memset(returned_parameter, 0x01, sizeof(returned_parameter));
 
-		output_buffer[0] = ParameterStartAddress;
+		eeprom_cell_address[0] = ParameterStartAddress;
 
 		result = HP03S_ERROR;
 		expected_result = HP03S_OK;
@@ -55,7 +55,7 @@ TEST(HP03S_I2CParameter, ReadOk)
 	 * => I2C_Run()
 	 */
 	MockI2C_Expect_I2C_WriteTo_and_check_buffer(EEPROM_DeviceAddress,
-						    1, output_buffer);
+						    1, eeprom_cell_address);
 	MockI2C_Expect_I2C_ReadFrom_and_fill_buffer(EEPROM_DeviceAddress,
 						    4, expected_parameter);
 	MockI2C_Expect_I2C_Run_and_return(I2C_Ok);
@@ -70,7 +70,7 @@ TEST(HP03S_I2CParameter, NoResponse)
 {
 	expected_result = HP03S_NoDevice;
 	MockI2C_Expect_I2C_WriteTo_and_check_buffer(EEPROM_DeviceAddress,
-						    1, output_buffer);
+						    1, eeprom_cell_address);
 	MockI2C_Expect_I2C_ReadFrom_and_fill_buffer(EEPROM_DeviceAddress,
 						    4, expected_parameter);
 	MockI2C_Expect_I2C_Run_and_return(I2C_Timeout);

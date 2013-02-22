@@ -14,7 +14,7 @@ TEST_GROUP(HP03S_I2CCoefficients)
 {
 	HP03S_Result result;
 	HP03S_Result expected_result;
-	uint8_t EEPROM_Address[1];
+	uint8_t EEPROM_CellAddress[1];
 	uint16_t expected_coefficients[7];
 	uint16_t returned_coefficients[7];
 
@@ -26,7 +26,7 @@ TEST_GROUP(HP03S_I2CCoefficients)
 		memset(expected_coefficients, 0xAA, sizeof(expected_coefficients));
 		memset(returned_coefficients, 0x01, sizeof(returned_coefficients));
 
-		EEPROM_Address[0] = CoefficientStartAddress;
+		EEPROM_CellAddress[0] = CoefficientStartAddress;
 
 		result = HP03S_ERROR;
 		expected_result = HP03S_OK;
@@ -55,9 +55,10 @@ TEST(HP03S_I2CCoefficients, ReadOk)
 	 * => I2C_Run()
 	 */
 	MockI2C_Expect_I2C_WriteTo_and_check_buffer(EEPROM_DeviceAddress,
-						    1, EEPROM_Address);
+						    1, EEPROM_CellAddress);
 	MockI2C_Expect_I2C_ReadFrom_and_fill_buffer(EEPROM_DeviceAddress,
-						    14, (uint8_t *)expected_coefficients);
+						    14,
+						    (uint8_t *)expected_coefficients);
 	MockI2C_Expect_I2C_Run_and_return(I2C_Ok);
 
 	result = HP03S_ReadSensorCoefficient(returned_coefficients);
