@@ -2,6 +2,7 @@
 #include "HP03S.h"
 #include "HP03S_internal.h"
 #include "I2C.h"
+#include "Time.h"
 
 static const I2C_Address EEPROM_DeviceAddress = 0xA0;
 static const uint8_t CoefficientStartAddress = 0x10;
@@ -40,7 +41,22 @@ static HP03S_Result HP03S_ReadTemperatureImpl(uint16_t *val)
 
 static HP03S_Result HP03S_ReadPressureImpl(uint16_t *val)
 {
-	return 0;
+	uint8_t buffer[2];
+	buffer[0] = 0xFF;
+	buffer[1] = 0xF0;
+
+	I2C_WriteTo(0xEE, 2, buffer);
+	I2C_Run();
+
+	Time_msWait(40);
+
+	buffer[0] = 0xFD;
+	I2C_WriteTo(0xEE, 1, buffer);
+	I2C_ReadFrom(0xEE, 2, buffer);
+	I2C_Run();
+
+	*val = (uint16_t)(buffer[1] | (buffer[0] << 8));
+	return HP03S_OK;
 }
 
 
