@@ -24,8 +24,8 @@ TEST_GROUP(HP03S_AdValue)
 	HP03S_Result expected_result;
 	uint8_t ad_command[2];
 	uint8_t expected_value[2];
-	uint16_t expected_pressure;
-	uint16_t pressure;
+	uint16_t expected_ad_value;
+	uint16_t ad_value;
 
 	static const I2C_Address Ad_DeviceAddress = 0xEE;
 
@@ -33,8 +33,8 @@ TEST_GROUP(HP03S_AdValue)
 	{
 		expected_value[0] = 0x04;
 		expected_value[1] = 0x73;
-		pressure = 0;
-		expected_pressure = 0x473;
+		ad_value = 0;
+		expected_ad_value = 0x473;
 
 		result = HP03S_ERROR;
 		expected_result = HP03S_OK;
@@ -51,9 +51,10 @@ TEST_GROUP(HP03S_AdValue)
 		mock_c()->clear();
 
 		LONGS_EQUAL(expected_result, result);
-		LONGS_EQUAL(expected_pressure, pressure);
+		LONGS_EQUAL(expected_ad_value, ad_value);
 	}
 };
+
 
 TEST(HP03S_AdValue, PressureReadOk)
 {
@@ -85,5 +86,29 @@ TEST(HP03S_AdValue, PressureReadOk)
 						    2, expected_value);
 	MockI2C_Expect_I2C_Run_and_return(I2C_Ok);
 
-	result = HP03S_ReadPressure(&pressure);
+	result = HP03S_ReadPressure(&ad_value);
 }
+
+
+TEST(HP03S_AdValue, TemperatureReadOk)
+{
+	ad_command[0] = 0xFF;
+	ad_command[1] = 0xD0;
+
+	MockI2C_Expect_I2C_WriteTo_and_check_buffer(Ad_DeviceAddress,
+						    2, ad_command);
+	MockI2C_Expect_I2C_Run_and_return(I2C_Ok);
+
+	/* TODO this does not enforce order */
+	mock_c()->expectOneCall("Time_msWait")->withIntParameters("milliseconds", 40);
+
+	ad_command[0] = 0xFD;
+	MockI2C_Expect_I2C_WriteTo_and_check_buffer(Ad_DeviceAddress,
+						    1, ad_command);
+	MockI2C_Expect_I2C_ReadFrom_and_fill_buffer(Ad_DeviceAddress,
+						    2, expected_value);
+	MockI2C_Expect_I2C_Run_and_return(I2C_Ok);
+
+	result = HP03S_ReadTemperature(&ad_value);
+}
+

@@ -41,7 +41,22 @@ static HP03S_Result HP03S_ReadSensorParameterImpl(uint8_t *parameter)
 
 static HP03S_Result HP03S_ReadTemperatureImpl(uint16_t *val)
 {
-	return 0;
+	uint8_t buffer[2];
+	buffer[0] = 0xFF;
+	buffer[1] = 0xD0;
+
+	I2C_WriteTo(0xEE, 2, buffer);
+	I2C_Run();
+
+	Time_msWait(40);
+
+	buffer[0] = 0xFD;
+	I2C_WriteTo(0xEE, 1, buffer);
+	I2C_ReadFrom(0xEE, 2, buffer);
+	I2C_Run();
+
+	*val = (uint16_t)(buffer[1] | (buffer[0] << 8));
+	return HP03S_OK;
 }
 
 static HP03S_Result HP03S_ReadPressureImpl(uint16_t *val)
