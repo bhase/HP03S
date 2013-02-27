@@ -5,8 +5,13 @@
 #include "Time.h"
 
 static const I2C_Address EEPROM_DeviceAddress = 0xA0;
+static const I2C_Address AD_DeviceAddress = 0xEE;
+
 static const uint8_t CoefficientStartAddress = 0x10;
 static const uint8_t ParameterStartAddress = 0x1E;
+
+static const uint8_t ChannelPressure = 0xF0;
+static const uint8_t ChannelTemperature = 0xD0;
 
 static I2C_Result read_from_eeprom(uint8_t address, uint8_t length, uint8_t *buffer)
 {
@@ -39,44 +44,35 @@ static HP03S_Result HP03S_ReadSensorParameterImpl(uint8_t *parameter)
 	return result;
 }
 
-static HP03S_Result HP03S_ReadTemperatureImpl(uint16_t *val)
+
+static I2C_Result ReadAdValue(uint8_t channel, uint16_t *val)
 {
 	uint8_t buffer[2];
 	buffer[0] = 0xFF;
-	buffer[1] = 0xD0;
+	buffer[1] = channel;
 
-	I2C_WriteTo(0xEE, 2, buffer);
+	I2C_WriteTo(AD_DeviceAddress, 2, buffer);
 	I2C_Run();
 
 	Time_msWait(40);
 
 	buffer[0] = 0xFD;
-	I2C_WriteTo(0xEE, 1, buffer);
-	I2C_ReadFrom(0xEE, 2, buffer);
+	I2C_WriteTo(AD_DeviceAddress, 1, buffer);
+	I2C_ReadFrom(AD_DeviceAddress, 2, buffer);
 	I2C_Run();
 
 	*val = (uint16_t)(buffer[1] | (buffer[0] << 8));
-	return HP03S_OK;
+	return I2C_Ok;
+}
+
+static HP03S_Result HP03S_ReadTemperatureImpl(uint16_t *val)
+{
+	return ReadAdValue(ChannelTemperature, val);
 }
 
 static HP03S_Result HP03S_ReadPressureImpl(uint16_t *val)
 {
-	uint8_t buffer[2];
-	buffer[0] = 0xFF;
-	buffer[1] = 0xF0;
-
-	I2C_WriteTo(0xEE, 2, buffer);
-	I2C_Run();
-
-	Time_msWait(40);
-
-	buffer[0] = 0xFD;
-	I2C_WriteTo(0xEE, 1, buffer);
-	I2C_ReadFrom(0xEE, 2, buffer);
-	I2C_Run();
-
-	*val = (uint16_t)(buffer[1] | (buffer[0] << 8));
-	return HP03S_OK;
+	return ReadAdValue(ChannelPressure, val);
 }
 
 
