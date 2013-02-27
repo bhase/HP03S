@@ -18,10 +18,15 @@ static I2C_Result read_from_eeprom(uint8_t address, uint8_t length, uint8_t *buf
 
 static HP03S_Result HP03S_ReadSensorCoefficientImpl(uint16_t *coefficient)
 {
+	uint8_t buffer[14];
+	int i;
 	I2C_Result result = read_from_eeprom(CoefficientStartAddress,
-					     14, (uint8_t *)coefficient);
+					     14, buffer);
 	if (result == I2C_Timeout)
 		return HP03S_NoDevice;
+
+	for (i = 0; i < 7; i++)
+		coefficient[i] = (uint16_t)((buffer[i*2] << 8) | buffer[i*2 + 1]);
 	return result;
 }
 
