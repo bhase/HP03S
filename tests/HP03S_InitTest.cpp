@@ -42,7 +42,7 @@ TEST_GROUP(HP03S_Init)
 	{
 		mock_c()->checkExpectations();
 		mock_c()->clear();
-		LONGS_EQUAL(init_result, expected_result);
+		LONGS_EQUAL(expected_result, init_result);
 	}
 };
 
@@ -67,6 +67,18 @@ TEST(HP03S_Init, NoDevice)
 	expected_result = HP03S_NoDevice;
 
 	mock_c()->expectOneCall("HP03S_ReadSensorParameter")
+		->andReturnIntValue(HP03S_NoDevice);
+
+	init_result = HP03S_Create();
+}
+
+TEST(HP03S_Init, DeviceError)
+{
+	expected_result = HP03S_DeviceError;
+
+	mock_c()->expectOneCall("HP03S_ReadSensorParameter")
+		->andReturnIntValue(HP03S_OK);
+	mock_c()->expectOneCall("HP03S_ReadSensorCoefficient")
 		->andReturnIntValue(HP03S_NoDevice);
 
 	init_result = HP03S_Create();

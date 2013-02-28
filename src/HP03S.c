@@ -44,7 +44,10 @@ HP03S_Result HP03S_Create(void)
 	if (result != HP03S_OK)
 		return result;
 
-	HP03S_ReadSensorCoefficient(coefficients);
+	result = HP03S_ReadSensorCoefficient(coefficients);
+	if (result != HP03S_OK)
+		return HP03S_DeviceError;
+
 	sensor_coefficients.C1 = coefficients[C1_SensitivityCoefficient];
 	sensor_coefficients.C2 = coefficients[C2_OffsetCoefficient];
 	sensor_coefficients.C3 = coefficients[C3_TemperatureCoefficientOfSensitivity];
