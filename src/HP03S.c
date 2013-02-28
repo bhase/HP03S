@@ -36,10 +36,14 @@ HP03S_Result HP03S_Create(void)
 {
 	uint16_t coefficients[7];
 	uint8_t parameter[4];
+	HP03S_Result result;
 
 	GPIO_SetXCLR_Low();
 
-	HP03S_ReadSensorParameter(parameter);
+	result = HP03S_ReadSensorParameter(parameter);
+	if (result != HP03S_OK)
+		return result;
+
 	HP03S_ReadSensorCoefficient(coefficients);
 	sensor_coefficients.C1 = coefficients[C1_SensitivityCoefficient];
 	sensor_coefficients.C2 = coefficients[C2_OffsetCoefficient];

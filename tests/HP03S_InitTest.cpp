@@ -11,13 +11,13 @@ extern "C"
 static HP03S_Result Mock_HP03S_ReadSensorCoefficient(uint16_t *coefficient)
 {
 	mock_c()->actualCall("HP03S_ReadSensorCoefficient");
-	return HP03S_OK;
+	return (HP03S_Result)mock_c()->returnValue().value.intValue;
 }
 
 static HP03S_Result Mock_HP03S_ReadSensorParameter(uint8_t *parameter)
 {
 	mock_c()->actualCall("HP03S_ReadSensorParameter");
-	return HP03S_OK;
+	return (HP03S_Result)mock_c()->returnValue().value.intValue;
 }
 
 } /* extern "C" */
@@ -48,8 +48,10 @@ TEST_GROUP(HP03S_Init)
 
 TEST(HP03S_Init, Create)
 {
-	mock_c()->expectOneCall("HP03S_ReadSensorCoefficient");
-	mock_c()->expectOneCall("HP03S_ReadSensorParameter");
+	mock_c()->expectOneCall("HP03S_ReadSensorCoefficient")
+		->andReturnIntValue(HP03S_OK);
+	mock_c()->expectOneCall("HP03S_ReadSensorParameter")
+		->andReturnIntValue(HP03S_OK);
 
 	init_result = HP03S_Create();
 }
@@ -60,3 +62,12 @@ TEST(HP03S_Init, Uninitialized)
 	init_result = HP03S_Measure();
 }
 
+TEST(HP03S_Init, NoDevice)
+{
+	expected_result = HP03S_NoDevice;
+
+	mock_c()->expectOneCall("HP03S_ReadSensorParameter")
+		->andReturnIntValue(HP03S_NoDevice);
+
+	init_result = HP03S_Create();
+}
