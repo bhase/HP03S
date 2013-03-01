@@ -218,3 +218,12 @@ TEST(HP03S_Init, RangeError_B_high)
 	init_result = HP03S_Create();
 }
 
+
+TEST(HP03S_Init, RangeError_C_low)
+{
+	/* out of range low */
+	setup_parameterRangeError(SensorParameter_C, 0);
+
+	init_result = HP03S_Create();
+}
+
