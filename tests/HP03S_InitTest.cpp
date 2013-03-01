@@ -110,7 +110,7 @@ TEST(HP03S_Init, DeviceError)
 TEST(HP03S_Init, RangeError_C1)
 {
 	/* out of range low, high goes to 0xFFFF */
-	setup_coefficientRangeError(C1_SensitivityCoefficient, 0x99);
+	setup_coefficientRangeError(C1_SensitivityCoefficient, 0x9F);
 
 	init_result = HP03S_Create();
 }
@@ -135,6 +135,14 @@ TEST(HP03S_Init, RangeError_C4)
 {
 	/* out of range high, low goes to 0 */
 	setup_coefficientRangeError(C4_TemperatureCoefficientOfOffset, 0x1001);
+
+	init_result = HP03S_Create();
+}
+
+TEST(HP03S_Init, RangeError_C5)
+{
+	/* out of range low, high goes to 0xFFFF */
+	setup_coefficientRangeError(C5_ReferenceTemperature, 0x9FF);
 
 	init_result = HP03S_Create();
 }
