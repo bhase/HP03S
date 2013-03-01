@@ -32,6 +32,21 @@ static enum {
 	Ready,
 } module_state;
 
+
+static int coefficients_out_of_range(uint16_t *coefficients)
+{
+	if (   (coefficients[C1_SensitivityCoefficient] < 0x100)
+	    || (coefficients[C2_OffsetCoefficient] > 0x1FFF)
+	    || (coefficients[C3_TemperatureCoefficientOfSensitivity] > 0x400)
+	    || (coefficients[C4_TemperatureCoefficientOfOffset] > 0x1000)
+	    || (coefficients[C5_ReferenceTemperature] < 0x1000)
+	    || (coefficients[C6_TemperatureCoefficientOfTemperature] > 0x4000)
+	    || (coefficients[C7_OffsetFineTuning] < 0x960)
+	    || (coefficients[C7_OffsetFineTuning] > 0xA28))
+		return 1;
+	return 0;
+}
+
 HP03S_Result HP03S_Create(void)
 {
 	uint16_t coefficients[7];
@@ -48,21 +63,7 @@ HP03S_Result HP03S_Create(void)
 	if (result != HP03S_OK)
 		return HP03S_DeviceError;
 
-	if (coefficients[C1_SensitivityCoefficient] < 0x100)
-		return HP03S_RangeError;
-	if (coefficients[C2_OffsetCoefficient] > 0x1FFF)
-		return HP03S_RangeError;
-	if (coefficients[C3_TemperatureCoefficientOfSensitivity] > 0x400)
-		return HP03S_RangeError;
-	if (coefficients[C4_TemperatureCoefficientOfOffset] > 0x1000)
-		return HP03S_RangeError;
-	if (coefficients[C5_ReferenceTemperature] < 0x1000)
-		return HP03S_RangeError;
-	if (coefficients[C6_TemperatureCoefficientOfTemperature] > 0x4000)
-		return HP03S_RangeError;
-	if (coefficients[C7_OffsetFineTuning] < 0x960)
-		return HP03S_RangeError;
-	if (coefficients[C7_OffsetFineTuning] > 0xA28)
+	if (coefficients_out_of_range(coefficients))
 		return HP03S_RangeError;
 
 	if (parameter[SensorParameter_A] < 1)
