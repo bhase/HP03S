@@ -50,6 +50,8 @@ HP03S_Result HP03S_Create(void)
 
 	if (coefficients[C1_SensitivityCoefficient] < 0x100)
 		return HP03S_RangeError;
+	if (coefficients[C2_OffsetCoefficient] > 0x1FFF)
+		return HP03S_RangeError;
 
 	sensor_coefficients.C1 = coefficients[C1_SensitivityCoefficient];
 	sensor_coefficients.C2 = coefficients[C2_OffsetCoefficient];
