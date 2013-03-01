@@ -48,6 +48,22 @@ TEST_GROUP(HP03S_Init)
 		sensor_coefficients[C7_OffsetFineTuning] = 2500;
 	}
 
+	void setup_defaultCalls(void)
+	{
+		mock_c()->expectOneCall("HP03S_ReadSensorCoefficient")
+			->andReturnIntValue(HP03S_OK);
+		mock_c()->expectOneCall("HP03S_ReadSensorParameter")
+			->andReturnIntValue(HP03S_OK);
+	}
+
+	void setup_coefficientRangeError(SensorCoefficient c, uint16_t value)
+	{
+		setup_defaultCalls();
+
+		sensor_coefficients[c] = value;
+		expected_result = HP03S_RangeError;
+	}
+
 	void teardown()
 	{
 		mock_c()->checkExpectations();
@@ -58,11 +74,7 @@ TEST_GROUP(HP03S_Init)
 
 TEST(HP03S_Init, Create)
 {
-	mock_c()->expectOneCall("HP03S_ReadSensorCoefficient")
-		->andReturnIntValue(HP03S_OK);
-	mock_c()->expectOneCall("HP03S_ReadSensorParameter")
-		->andReturnIntValue(HP03S_OK);
-
+	setup_defaultCalls();
 	init_result = HP03S_Create();
 }
 
@@ -97,42 +109,24 @@ TEST(HP03S_Init, DeviceError)
 
 TEST(HP03S_Init, RangeError_C1)
 {
-	expected_result = HP03S_RangeError;
 	/* out of range low, high goes to 0xFFFF */
-	sensor_coefficients[C1_SensitivityCoefficient] = 0x99;
-
-	mock_c()->expectOneCall("HP03S_ReadSensorParameter")
-		->andReturnIntValue(HP03S_OK);
-	mock_c()->expectOneCall("HP03S_ReadSensorCoefficient")
-		->andReturnIntValue(HP03S_OK);
+	setup_coefficientRangeError(C1_SensitivityCoefficient, 0x99);
 
 	init_result = HP03S_Create();
 }
 
 TEST(HP03S_Init, RangeError_C2)
 {
-	expected_result = HP03S_RangeError;
 	/* out of range high, low goes to 0 */
-	sensor_coefficients[C2_OffsetCoefficient] = 0x2000;
-
-	mock_c()->expectOneCall("HP03S_ReadSensorParameter")
-		->andReturnIntValue(HP03S_OK);
-	mock_c()->expectOneCall("HP03S_ReadSensorCoefficient")
-		->andReturnIntValue(HP03S_OK);
+	setup_coefficientRangeError(C2_OffsetCoefficient, 0x2000);
 
 	init_result = HP03S_Create();
 }
 
 TEST(HP03S_Init, RangeError_C3)
 {
-	expected_result = HP03S_RangeError;
 	/* out of range high, low goes to 0 */
-	sensor_coefficients[C3_TemperatureCoefficientOfSensitivity] = 0x401;
-
-	mock_c()->expectOneCall("HP03S_ReadSensorParameter")
-		->andReturnIntValue(HP03S_OK);
-	mock_c()->expectOneCall("HP03S_ReadSensorCoefficient")
-		->andReturnIntValue(HP03S_OK);
+	setup_coefficientRangeError(C3_TemperatureCoefficientOfSensitivity, 0x401);
 
 	init_result = HP03S_Create();
 }
