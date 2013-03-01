@@ -8,6 +8,7 @@ extern "C"
 #include "CppUTestExt/MockSupport_c.h"
 
 static uint16_t sensor_coefficients[7];
+static uint8_t sensor_parameter[4];
 
 static HP03S_Result Mock_HP03S_ReadSensorCoefficient(uint16_t *coefficient)
 {
@@ -19,6 +20,7 @@ static HP03S_Result Mock_HP03S_ReadSensorCoefficient(uint16_t *coefficient)
 static HP03S_Result Mock_HP03S_ReadSensorParameter(uint8_t *parameter)
 {
 	mock_c()->actualCall("HP03S_ReadSensorParameter");
+	memcpy(parameter, sensor_parameter, sizeof(sensor_parameter));
 	return (HP03S_Result)mock_c()->returnValue().value.intValue;
 }
 
@@ -46,6 +48,11 @@ TEST_GROUP(HP03S_Init)
 		sensor_coefficients[C5_ReferenceTemperature] =  9191;
 		sensor_coefficients[C6_TemperatureCoefficientOfTemperature] = 3990;
 		sensor_coefficients[C7_OffsetFineTuning] = 2500;
+
+		sensor_parameter[SensorParameter_A] = 1;
+		sensor_parameter[SensorParameter_B] = 4;
+		sensor_parameter[SensorParameter_C] = 4;
+		sensor_parameter[SensorParameter_D] = 9;
 	}
 
 	void setup_defaultCalls(void)
@@ -61,6 +68,14 @@ TEST_GROUP(HP03S_Init)
 		setup_defaultCalls();
 
 		sensor_coefficients[c] = value;
+		expected_result = HP03S_RangeError;
+	}
+
+	void setup_parameterRangeError(SensorParameter p, uint8_t value)
+	{
+		setup_defaultCalls();
+
+		sensor_parameter[p] = value;
 		expected_result = HP03S_RangeError;
 	}
 
@@ -167,6 +182,14 @@ TEST(HP03S_Init, RangeError_C7_high)
 {
 	/* out of range high */
 	setup_coefficientRangeError(C7_OffsetFineTuning, 0xA29);
+
+	init_result = HP03S_Create();
+}
+
+TEST(HP03S_Init, RangeError_A_low)
+{
+	/* out of range low */
+	setup_parameterRangeError(SensorParameter_A, 0);
 
 	init_result = HP03S_Create();
 }

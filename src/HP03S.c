@@ -65,6 +65,9 @@ HP03S_Result HP03S_Create(void)
 	if (coefficients[C7_OffsetFineTuning] > 0xA28)
 		return HP03S_RangeError;
 
+	if (parameter[SensorParameter_A] < 1)
+		return HP03S_RangeError;
+
 	sensor_coefficients.C1 = coefficients[C1_SensitivityCoefficient];
 	sensor_coefficients.C2 = coefficients[C2_OffsetCoefficient];
 	sensor_coefficients.C3 = coefficients[C3_TemperatureCoefficientOfSensitivity];
