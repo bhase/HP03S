@@ -33,7 +33,7 @@ static enum {
 } module_state;
 
 
-static int coefficients_out_of_range(uint16_t *coefficients)
+static int coefficient_out_of_range(uint16_t *coefficients)
 {
 	if (   (coefficients[C1_SensitivityCoefficient] < 0x100)
 	    || (coefficients[C2_OffsetCoefficient] > 0x1FFF)
@@ -46,6 +46,21 @@ static int coefficients_out_of_range(uint16_t *coefficients)
 		return 1;
 	return 0;
 }
+
+static int parameter_out_of_range(uint8_t *parameter)
+{
+	if (   (parameter[SensorParameter_A] < 1)
+	    || (parameter[SensorParameter_A] > 0x3F)
+	    || (parameter[SensorParameter_B] < 1)
+	    || (parameter[SensorParameter_B] > 0x3F)
+	    || (parameter[SensorParameter_C] < 1)
+	    || (parameter[SensorParameter_C] > 0xF)
+	    || (parameter[SensorParameter_D] < 1)
+	    || (parameter[SensorParameter_D] > 0xF))
+		return 1;
+	return 0;
+}
+
 
 HP03S_Result HP03S_Create(void)
 {
@@ -63,24 +78,9 @@ HP03S_Result HP03S_Create(void)
 	if (result != HP03S_OK)
 		return HP03S_DeviceError;
 
-	if (coefficients_out_of_range(coefficients))
+	if (coefficient_out_of_range(coefficients))
 		return HP03S_RangeError;
-
-	if (parameter[SensorParameter_A] < 1)
-		return HP03S_RangeError;
-	if (parameter[SensorParameter_A] > 0x3F)
-		return HP03S_RangeError;
-	if (parameter[SensorParameter_B] < 1)
-		return HP03S_RangeError;
-	if (parameter[SensorParameter_B] > 0x3F)
-		return HP03S_RangeError;
-	if (parameter[SensorParameter_C] < 1)
-		return HP03S_RangeError;
-	if (parameter[SensorParameter_C] > 0xF)
-		return HP03S_RangeError;
-	if (parameter[SensorParameter_D] < 1)
-		return HP03S_RangeError;
-	if (parameter[SensorParameter_D] > 0xF)
+	if (parameter_out_of_range(parameter))
 		return HP03S_RangeError;
 
 	sensor_coefficients.C1 = coefficients[C1_SensitivityCoefficient];
