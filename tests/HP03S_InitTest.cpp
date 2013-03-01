@@ -146,3 +146,11 @@ TEST(HP03S_Init, RangeError_C5)
 
 	init_result = HP03S_Create();
 }
+
+TEST(HP03S_Init, RangeError_C6)
+{
+	/* out of range high, low goes to 0 */
+	setup_coefficientRangeError(C6_TemperatureCoefficientOfTemperature, 0x4001);
+
+	init_result = HP03S_Create();
+}

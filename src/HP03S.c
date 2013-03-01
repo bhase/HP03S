@@ -58,6 +58,8 @@ HP03S_Result HP03S_Create(void)
 		return HP03S_RangeError;
 	if (coefficients[C5_ReferenceTemperature] < 0x1000)
 		return HP03S_RangeError;
+	if (coefficients[C6_TemperatureCoefficientOfTemperature] > 0x4000)
+		return HP03S_RangeError;
 
 	sensor_coefficients.C1 = coefficients[C1_SensitivityCoefficient];
 	sensor_coefficients.C2 = coefficients[C2_OffsetCoefficient];
