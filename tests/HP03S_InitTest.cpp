@@ -154,3 +154,11 @@ TEST(HP03S_Init, RangeError_C6)
 
 	init_result = HP03S_Create();
 }
+
+TEST(HP03S_Init, RangeError_C7_low)
+{
+	/* out of range low */
+	setup_coefficientRangeError(C7_OffsetFineTuning, 0x95F);
+
+	init_result = HP03S_Create();
+}
