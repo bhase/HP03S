@@ -2,15 +2,17 @@
 
 extern "C"
 {
-
+#include <string.h>
 #include "HP03S.h"
 #include "HP03S_internal.h"
-
 #include "CppUTestExt/MockSupport_c.h"
+
+static uint16_t sensor_coefficients[7];
 
 static HP03S_Result Mock_HP03S_ReadSensorCoefficient(uint16_t *coefficient)
 {
 	mock_c()->actualCall("HP03S_ReadSensorCoefficient");
+	memcpy(coefficient, sensor_coefficients, sizeof(sensor_coefficients));
 	return (HP03S_Result)mock_c()->returnValue().value.intValue;
 }
 
@@ -36,6 +38,14 @@ TEST_GROUP(HP03S_Init)
 		UT_PTR_SET(HP03S_ReadSensorParameter, Mock_HP03S_ReadSensorParameter);
 		init_result = HP03S_ERROR;
 		expected_result = HP03S_OK;
+
+		sensor_coefficients[C1_SensitivityCoefficient] = 29908;
+		sensor_coefficients[C2_OffsetCoefficient] = 3724;
+		sensor_coefficients[C3_TemperatureCoefficientOfSensitivity] = 312;
+		sensor_coefficients[C4_TemperatureCoefficientOfOffset] = 441;
+		sensor_coefficients[C5_ReferenceTemperature] =  9191;
+		sensor_coefficients[C6_TemperatureCoefficientOfTemperature] = 3990;
+		sensor_coefficients[C7_OffsetFineTuning] = 2500;
 	}
 
 	void teardown()
@@ -80,6 +90,20 @@ TEST(HP03S_Init, DeviceError)
 		->andReturnIntValue(HP03S_OK);
 	mock_c()->expectOneCall("HP03S_ReadSensorCoefficient")
 		->andReturnIntValue(HP03S_NoDevice);
+
+	init_result = HP03S_Create();
+}
+
+TEST(HP03S_Init, RangeError_C1)
+{
+	expected_result = HP03S_RangeError;
+	/* lower range, upper range is full 16 bit */
+	sensor_coefficients[C1_SensitivityCoefficient] = 0x99;
+
+	mock_c()->expectOneCall("HP03S_ReadSensorParameter")
+		->andReturnIntValue(HP03S_OK);
+	mock_c()->expectOneCall("HP03S_ReadSensorCoefficient")
+		->andReturnIntValue(HP03S_OK);
 
 	init_result = HP03S_Create();
 }
