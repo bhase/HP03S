@@ -126,8 +126,9 @@ HP03S_Result HP03S_Measure(void)
 		return HP03S_UNINITIALIZED;
 
 	GPIO_SetXCLR_High();
-	HP03S_ReadTemperature(&measured_temperature);
-	ad_result = HP03S_ReadPressure(&measured_pressure);
+	ad_result = HP03S_ReadTemperature(&measured_temperature);
+	if (ad_result == HP03S_OK)
+		ad_result = HP03S_ReadPressure(&measured_pressure);
 	GPIO_SetXCLR_Low();
 
 	if (ad_result != HP03S_OK)
