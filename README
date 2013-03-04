@@ -11,8 +11,22 @@ From the Hope page:
 Available for example at Pollin
 http://www.pollin.de/shop/dt/MDg4OTgxOTk-/Bausaetze_Module/Module/Luftdruck_Modul_HP03S.html
 
-Requirements
-============
+Requirements to run
+===================
+Externals:
+- I2C (see I2C.h)
+- GPIO pin (see GPIO.h)
+- system function to wait milliseconds (see Time.h)
+- 32 kHz on MCLK (not controlled by this module)
+  This is explicit left out for power management of system
+  If needed, an API could be introduced
+  HP03S_Enable/HP03S_Disable which would control MCLK
+
+Many of the required interfaces can be implemented
+as macro depending on your platform if runtime is important.
+
+Requirements to build
+=====================
 the build is done with make, tests are done with CppUTest
 (http://www.cpputest.org). To build and run the tests (for which this
 Makefile is configured), you need to have installed CppUTest and put it in
