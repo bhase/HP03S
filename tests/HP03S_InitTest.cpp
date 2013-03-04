@@ -93,12 +93,6 @@ TEST(HP03S_Init, Create)
 	init_result = HP03S_Create();
 }
 
-TEST(HP03S_Init, Uninitialized)
-{
-	expected_result = HP03S_UNINITIALIZED;
-	init_result = HP03S_Measure();
-}
-
 TEST(HP03S_Init, NoDevice)
 {
 	expected_result = HP03S_NoDevice;
