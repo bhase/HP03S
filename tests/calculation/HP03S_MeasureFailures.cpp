@@ -63,3 +63,14 @@ TEST(HP03S_MeasureFailure, Uninitialized)
 
 	result = HP03S_Measure();
 }
+
+TEST(HP03S_MeasureFailure, Timeout2ndRead)
+{
+	expected_result = HP03S_DeviceError;
+	mock_c()->expectOneCall("HP03S_ReadTemperature")
+		->andReturnIntValue(HP03S_OK);
+	mock_c()->expectOneCall("HP03S_ReadPressure")
+		->andReturnIntValue(HP03S_NoDevice);
+
+	result = HP03S_Measure();
+}

@@ -120,14 +120,18 @@ HP03S_Result HP03S_Measure(void)
 {
 	uint16_t measured_temperature = 4107;
 	uint16_t measured_pressure = 30036;
+	HP03S_Result ad_result;
 
 	if (module_state == UnInitialized)
 		return HP03S_UNINITIALIZED;
 
 	GPIO_SetXCLR_High();
 	HP03S_ReadTemperature(&measured_temperature);
-	HP03S_ReadPressure(&measured_pressure);
+	ad_result = HP03S_ReadPressure(&measured_pressure);
 	GPIO_SetXCLR_Low();
+
+	if (ad_result != HP03S_OK)
+		return HP03S_DeviceError;
 
 	int temperature_distance  = measured_temperature - sensor_coefficients.C5;
 	/* 64 bit is needed for high temperatures */
