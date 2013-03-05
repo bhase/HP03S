@@ -88,7 +88,7 @@ static void WriteWhenReadExpectedFails(void)
 TEST(MockI2C, WriteWhenReadExpectedFails)
 {
 	testFailureWith(WriteWhenReadExpectedFails);
-	fixture->assertPrintContains("unexpected write");
+	fixture->assertPrintContains("unexpected I2C_Write");
 }
 
 
@@ -102,7 +102,7 @@ static void ReadWhenWriteExpectedFails(void)
 TEST(MockI2C, ReadWhenWriteExpectedFails)
 {
 	testFailureWith(ReadWhenWriteExpectedFails);
-	fixture->assertPrintContains("unexpected read");
+	fixture->assertPrintContains("unexpected I2C_Read");
 }
 
 
@@ -162,7 +162,7 @@ static void WrongSequence(void)
 TEST(MockI2C, WrongSequence)
 {
 	testFailureWith(WrongSequence);
-	fixture->assertPrintContains("unexpected read");
+	fixture->assertPrintContains("unexpected I2C_Read");
 }
 
 
@@ -208,7 +208,7 @@ static void UnexpectedRun(void)
 TEST(MockI2C, UnexpectedRun)
 {
 	testFailureWith(UnexpectedRun);
-	fixture->assertPrintContains("unexpected run");
+	fixture->assertPrintContains("unexpected I2C_Run");
 }
 
 
@@ -321,7 +321,7 @@ static void I2C_Write_ChecksBuffer(void)
 TEST(MockI2C, I2C_Write_ChecksBuffer)
 {
 	testFailureWith(I2C_Write_ChecksBuffer);
-	fixture->assertPrintContains("contents mismatch");
+	fixture->assertPrintContains("contents do not match");
 }
 
 

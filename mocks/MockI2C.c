@@ -1,4 +1,5 @@
 #include <string.h>
+#include <stdio.h>
 #include <stdarg.h>
 #include "MockI2C.h"
 #include "CppUTest/TestHarness_c.h"
@@ -20,19 +21,35 @@ typedef struct {
 
 
 static Expectation *expectations = NULL;
-static int last_used_expectation = 0;
-static int last_recorded_expectation = 0;
+static size_t last_used_expectation = 0;
+static size_t last_recorded_expectation = 0;
 static size_t max_expectations = 0;
 
-static const char* unexpected_write = "unexpected write";
-static const char* unexpected_run   = "unexpected run";
-static const char* unexpected_read  = "unexpected read";
+static const char* unexpected_write = "unexpected I2C_Write, expected %s";
+static const char* unexpected_run   = "unexpected I2C_Run, expected %s";
+static const char* unexpected_read  = "unexpected I2C_Read, expected %s";
 
+static const char *wrong_write_length = "wrong length for I2C_Write: expected %d, got %d";
+static const char *wrong_read_length = "wrong length for I2C_Read: expected %d, got %d";
+
+static char* expectationTypeToString(ExpectationType et)
+{
+	switch (et) {
+	case I2C_READ:
+		return "I2C_Read";
+	case I2C_WRITE:
+		return "I2C_Write";
+	case I2C_RUN:
+		return "I2C_Run";
+	default:
+		return "unknown";
+	}
+}
 
 static void failWhenNoFreeExpectationLeft(void)
 {
 	if (last_recorded_expectation >= max_expectations) {
-		FAIL_TEXT_C("too many expectations");
+		FAIL_TEXT_C("too many expectations, give bigger size to MockI2C_Create");
 	}
 }
 
@@ -47,16 +64,28 @@ static void failWhenAllrecordedExpectationsUsed(void)
 
 static void failWhenExpectationIsNot(ExpectationType type, const char* message)
 {
+	char message_buffer[512];
 	if (expectations[last_used_expectation].expectation_type != type) {
-		FAIL_TEXT_C(message);
+		snprintf(message_buffer, sizeof(message_buffer), message,
+			 expectationTypeToString(expectations[last_used_expectation].expectation_type));
+		FAIL_TEXT_C(message_buffer);
 	}
 }
 
 
 static void failWhenNotAllExpectionasUsed(void)
 {
+	char buffer[1024];
 	if (last_used_expectation < last_recorded_expectation) {
-		FAIL_TEXT_C("there are unused expectations");
+		size_t i = last_used_expectation;
+		snprintf(buffer, sizeof(buffer), "there are unused expectations:\n");
+		while (i < last_recorded_expectation) {
+			snprintf(buffer + strlen(buffer), sizeof(buffer) - strlen(buffer),
+				 "\t* expected one call to %s\n",
+				 expectationTypeToString(expectations[i].expectation_type));
+			i++;
+		}
+		FAIL_TEXT_C(buffer);
 	}
 }
 
@@ -64,23 +93,29 @@ static void failWhenNotAllExpectionasUsed(void)
 static void failWhenNotInitialized(void)
 {
 	if (expectations == NULL) {
-		FAIL_TEXT_C("not initialized");
+		FAIL_TEXT_C("MockI2C is not initialized, call MockI2C_Create before");
 	}
 }
 
 
 static void failWhenRecordedAddressIsNot(I2C_Address device_address)
 {
+	char buffer[512];
 	if ((expectations[last_used_expectation].address | 1) != (device_address | 1)) {
-		FAIL_TEXT_C("device address mismatch");
+		snprintf(buffer, sizeof(buffer), "device address mismatch, expected 0x%X, got 0x%X",
+			 expectations[last_used_expectation].address, device_address);
+		FAIL_TEXT_C(buffer);
 	}
 }
 
 
-static void failWhenRecordedLengthIsNot(uint8_t length)
+static void failWhenRecordedLengthIsNot(const char *message, uint8_t length)
 {
+	char buffer[512];
 	if (expectations[last_used_expectation].length != length) {
-		FAIL_TEXT_C("wrong length");
+		snprintf(buffer, sizeof(buffer), message,
+			 expectations[last_used_expectation].length, length);
+		FAIL_TEXT_C(buffer);
 	}
 }
 
@@ -88,7 +123,7 @@ static void failWhenRecordedLengthIsNot(uint8_t length)
 static void failWhenRecordedBufferDiffers(uint8_t *buffer, uint8_t length)
 {
 	if (memcmp(expectations[last_used_expectation].buffer, buffer, length) != 0) {
-		FAIL_TEXT_C("contents mismatch");
+		FAIL_TEXT_C("I2C_WriteTo: the output buffer contents do not match");
 	}
 }
 
@@ -177,7 +212,7 @@ void I2C_ReadFrom(I2C_Address device_address, uint8_t length, uint8_t *buffer)
 	failWhenAllrecordedExpectationsUsed();
 	failWhenExpectationIsNot(I2C_READ, unexpected_read);
 	failWhenRecordedAddressIsNot(device_address);
-	failWhenRecordedLengthIsNot(length);
+	failWhenRecordedLengthIsNot(wrong_read_length, length);
 	memcpy(buffer, expectations[last_used_expectation].buffer, length);
 	last_used_expectation++;
 }
@@ -187,7 +222,7 @@ void I2C_WriteTo(I2C_Address device_address, uint8_t length, uint8_t *buffer)
 	failWhenAllrecordedExpectationsUsed();
 	failWhenExpectationIsNot(I2C_WRITE, unexpected_write);
 	failWhenRecordedAddressIsNot(device_address);
-	failWhenRecordedLengthIsNot(length);
+	failWhenRecordedLengthIsNot(wrong_write_length, length);
 	failWhenRecordedBufferDiffers(buffer, length);
 	last_used_expectation++;
 }
