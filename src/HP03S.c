@@ -2,18 +2,25 @@
 #include "HP03S_internal.h"
 #include "GPIO.h"
 
+#include <limits.h>
+
+/*       _\|/_
+         (o o)
+ +----oOO-{_}-OOo------------------------------------------------------+
+ |                                                                     |
+ | Internal types                                                      |
+ |                                                                     |
+ +--------------------------------------------------------------------*/
+
 typedef int HP03SBOOL;
 
-#include <limits.h>
-static HP03SBOOL multiplicationInRange(signed int si_a, signed int si_b);
-
-static struct HP03S_results
+typedef struct HP03S_Results
 {
 	Temperature temperature;
 	Pressure pressure;
-} calculated;
+} HP03S_Results;
 
-static struct
+typedef struct HP30S_SensorCoefficients
 {
 	uint16_t C1;
 	uint16_t C2;
@@ -22,15 +29,43 @@ static struct
 	uint16_t C5;
 	uint16_t C6;
 	uint16_t C7;
-} sensor_coefficients;
+} HP03S_SensorCoefficients;
 
-static struct
+typedef struct HP03S_SensorParameter
 {
 	uint8_t A;
 	uint8_t B;
 	uint8_t C;
 	uint8_t D;
-} sensor_parameters;
+} HP03S_SensorParameter;
+
+
+/*       _\|/_
+         (o o)
+ +----oOO-{_}-OOo------------------------------------------------------+
+ |                                                                     |
+ | Internal functions                                                  |
+ |                                                                     |
+ +--------------------------------------------------------------------*/
+
+static HP03SBOOL coefficient_out_of_range(uint16_t *coefficients);
+static HP03SBOOL parameter_out_of_range(uint8_t *parameter);
+static HP03SBOOL multiplicationInRange(signed int si_a, signed int si_b);
+static void calculateResultWith(uint16_t measured_pressure,
+				uint16_t measured_temperature,
+				HP03S_Results *result);
+
+/*       _\|/_
+         (o o)
+ +----oOO-{_}-OOo------------------------------------------------------+
+ |                                                                     |
+ | Internal variables                                                  |
+ |                                                                     |
+ +--------------------------------------------------------------------*/
+
+static HP03S_Results calculated;
+static HP03S_SensorCoefficients sensor_coefficients;
+static HP03S_SensorParameter sensor_parameters;
 
 static enum {
 	UnInitialized = 0,
@@ -38,7 +73,7 @@ static enum {
 } module_state;
 
 
-static int coefficient_out_of_range(uint16_t *coefficients)
+static HP03SBOOL coefficient_out_of_range(uint16_t *coefficients)
 {
 	if (   (coefficients[C1_SensitivityCoefficient] < 0x100)
 	    || (coefficients[C2_OffsetCoefficient] > 0x1FFF)
@@ -52,7 +87,7 @@ static int coefficient_out_of_range(uint16_t *coefficients)
 	return 0;
 }
 
-static int parameter_out_of_range(uint8_t *parameter)
+static HP03SBOOL parameter_out_of_range(uint8_t *parameter)
 {
 	if (   (parameter[SensorParameter_A] < 1)
 	    || (parameter[SensorParameter_A] > 0x3F)
@@ -139,6 +174,14 @@ HP03S_Result HP03S_Measure(void)
 	if (ad_result != HP03S_OK)
 		return HP03S_DeviceError;
 
+	calculateResultWith(measured_pressure, measured_temperature, &calculated);
+
+	return HP03S_OK;
+}
+
+
+static void calculateResultWith(uint16_t measured_pressure, uint16_t measured_temperature, HP03S_Results *result)
+{
 	int temperature_distance  = measured_temperature - sensor_coefficients.C5;
 	/* 64 bit is needed for high temperatures */
 	HP03S_Bigint factor = measured_temperature < sensor_coefficients.C5
@@ -172,19 +215,16 @@ HP03S_Result HP03S_Measure(void)
 		x = (int)(sens / 16384 * (HP03S_Bigint)((measured_pressure - 7168))) - off;
 	}
 
-	calculated.pressure = x * 10 / 32 + sensor_coefficients.C7;
+	result->pressure = x * 10 / 32 + sensor_coefficients.C7;
 	if (multiplicationInRange(dUT, sensor_coefficients.C6)) {
-		calculated.temperature = 250 + (int)((dUT * sensor_coefficients.C6) / 65536)
+		result->temperature = 250 + (int)((dUT * sensor_coefficients.C6) / 65536)
 					     - (int)(dUT / (1 << sensor_parameters.D));
 	}
 	else {
-		calculated.temperature = 250 + (int)((dUT / 65536) * sensor_coefficients.C6)
+		result->temperature = 250 + (int)((dUT / 65536) * sensor_coefficients.C6)
 					     - (int)(dUT / (1 << sensor_parameters.D));
 	}
-
-	return HP03S_OK;
 }
-
 
 static HP03SBOOL multiplicationInRange(signed int si_a, signed int si_b)
 {
