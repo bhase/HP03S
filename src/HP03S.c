@@ -73,34 +73,13 @@ static enum {
 } module_state;
 
 
-static HP03SBOOL coefficient_out_of_range(uint16_t *coefficients)
-{
-	if (   (coefficients[C1_SensitivityCoefficient] < 0x100)
-	    || (coefficients[C2_OffsetCoefficient] > 0x1FFF)
-	    || (coefficients[C3_TemperatureCoefficientOfSensitivity] > 0x400)
-	    || (coefficients[C4_TemperatureCoefficientOfOffset] > 0x1000)
-	    || (coefficients[C5_ReferenceTemperature] < 0x1000)
-	    || (coefficients[C6_TemperatureCoefficientOfTemperature] > 0x4000)
-	    || (coefficients[C7_OffsetFineTuning] < 0x960)
-	    || (coefficients[C7_OffsetFineTuning] > 0xA28))
-		return 1;
-	return 0;
-}
-
-static HP03SBOOL parameter_out_of_range(uint8_t *parameter)
-{
-	if (   (parameter[SensorParameter_A] < 1)
-	    || (parameter[SensorParameter_A] > 0x3F)
-	    || (parameter[SensorParameter_B] < 1)
-	    || (parameter[SensorParameter_B] > 0x3F)
-	    || (parameter[SensorParameter_C] < 1)
-	    || (parameter[SensorParameter_C] > 0xF)
-	    || (parameter[SensorParameter_D] < 1)
-	    || (parameter[SensorParameter_D] > 0xF))
-		return 1;
-	return 0;
-}
-
+/*       _\|/_
+         (o o)
+ +----oOO-{_}-OOo------------------------------------------------------+
+ |                                                                     |
+ | Interface implementation                                            |
+ |                                                                     |
+ +--------------------------------------------------------------------*/
 
 HP03S_Result HP03S_Create(void)
 {
@@ -179,6 +158,42 @@ HP03S_Result HP03S_Measure(void)
 	return HP03S_OK;
 }
 
+
+/*       _\|/_
+         (o o)
+ +----oOO-{_}-OOo------------------------------------------------------+
+ |                                                                     |
+ | Internal functions implementation                                   |
+ |                                                                     |
+ +--------------------------------------------------------------------*/
+
+static HP03SBOOL coefficient_out_of_range(uint16_t *coefficients)
+{
+	if (   (coefficients[C1_SensitivityCoefficient] < 0x100)
+	    || (coefficients[C2_OffsetCoefficient] > 0x1FFF)
+	    || (coefficients[C3_TemperatureCoefficientOfSensitivity] > 0x400)
+	    || (coefficients[C4_TemperatureCoefficientOfOffset] > 0x1000)
+	    || (coefficients[C5_ReferenceTemperature] < 0x1000)
+	    || (coefficients[C6_TemperatureCoefficientOfTemperature] > 0x4000)
+	    || (coefficients[C7_OffsetFineTuning] < 0x960)
+	    || (coefficients[C7_OffsetFineTuning] > 0xA28))
+		return 1;
+	return 0;
+}
+
+static HP03SBOOL parameter_out_of_range(uint8_t *parameter)
+{
+	if (   (parameter[SensorParameter_A] < 1)
+	    || (parameter[SensorParameter_A] > 0x3F)
+	    || (parameter[SensorParameter_B] < 1)
+	    || (parameter[SensorParameter_B] > 0x3F)
+	    || (parameter[SensorParameter_C] < 1)
+	    || (parameter[SensorParameter_C] > 0xF)
+	    || (parameter[SensorParameter_D] < 1)
+	    || (parameter[SensorParameter_D] > 0xF))
+		return 1;
+	return 0;
+}
 
 static void calculateResultWith(uint16_t measured_pressure, uint16_t measured_temperature, HP03S_Results *result)
 {
