@@ -56,8 +56,8 @@ TEST(HP03S_Extrema, MaximumValues)
 	create_result = HP03S_Create();
 	measure_result = HP03S_Measure();
 
-	LONGS_EQUAL(1799231, HP03S_GetTemperature());
-	LONGS_EQUAL(-8497573, HP03S_GetPressure());
+	LONGS_EQUAL(1812295, HP03S_GetTemperature());
+	LONGS_EQUAL(-7920396, HP03S_GetPressure());
 }
 
 TEST(HP03S_Extrema, MinimumValues)

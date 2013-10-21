@@ -97,7 +97,7 @@ TEST(HP03S, TemperatureMax)
 	measure_result = HP03S_Measure();
 
 	LONGS_EQUAL(2857, HP03S_GetTemperature());
-	LONGS_EQUAL(18735, HP03S_GetPressure())
+	LONGS_EQUAL(18736, HP03S_GetPressure())
 }
 
 TEST(HP03S, PressureMin)

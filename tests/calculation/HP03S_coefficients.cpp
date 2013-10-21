@@ -130,8 +130,8 @@ TEST(HP03S_Coefficients, C5Max)
 {
 	testWithCoefficient(C5_ReferenceTemperature, 0xFFFF);
 
-	LONGS_EQUAL(-6763, HP03S_GetTemperature());
-	LONGS_EQUAL(-10218, HP03S_GetPressure());
+	LONGS_EQUAL(-6762, HP03S_GetTemperature());
+	LONGS_EQUAL(-10214, HP03S_GetPressure());
 }
 
 TEST(HP03S_Coefficients, C6Min)

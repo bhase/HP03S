@@ -2,7 +2,12 @@
 #include "HP03S_internal.h"
 #include "GPIO.h"
 
-static struct
+typedef int HP03SBOOL;
+
+#include <limits.h>
+static HP03SBOOL multiplicationInRange(signed int si_a, signed int si_b);
+
+static struct HP03S_results
 {
 	Temperature temperature;
 	Pressure pressure;
@@ -139,19 +144,73 @@ HP03S_Result HP03S_Measure(void)
 	HP03S_Bigint factor = measured_temperature < sensor_coefficients.C5
 		            ? sensor_parameters.B
 		            : sensor_parameters.A;
-	HP03S_Bigint dUT = temperature_distance -
-		((temperature_distance * factor * temperature_distance) /
-		 (16384l * (1 << sensor_parameters.C)));
+	HP03S_Bigint dUT = 0;
+	if (multiplicationInRange(temperature_distance, temperature_distance)) {
+		dUT = temperature_distance -
+		((temperature_distance * temperature_distance / 128) * factor) / ((1 << sensor_parameters.C) * 128);
+	}
+	else {
+		dUT = temperature_distance -
+		((temperature_distance * factor / 128) * temperature_distance) / ((1 << sensor_parameters.C) * 128);
+	}
 	int off = 4 * sensor_coefficients.C2
 		+ (int)((4 * (sensor_coefficients.C4 - 1024) * dUT) / 16384);
-	int sens = sensor_coefficients.C1
-		 + (int)((sensor_coefficients.C3 * dUT) / 1024);
-	int x = (int)((sens * (HP03S_Bigint)(measured_pressure - 7168)) / 16384) - off;
+	int sens = 0;
+	if (multiplicationInRange(dUT, sensor_coefficients.C3)) {
+		 sens = sensor_coefficients.C1
+		      + (int)((sensor_coefficients.C3 * dUT) / 1024l);
+	}
+	else {
+		 sens = sensor_coefficients.C1
+		      + (int)((sensor_coefficients.C3 / 1024l * dUT));
+	}
+	int x = 0;
+	if (multiplicationInRange(sens, measured_pressure)) {
+		x = (int)((sens * (HP03S_Bigint)(measured_pressure - 7168)) / 16384) - off;
+	}
+	else {
+		x = (int)(sens / 16384 * (HP03S_Bigint)((measured_pressure - 7168))) - off;
+	}
 
 	calculated.pressure = x * 10 / 32 + sensor_coefficients.C7;
-	calculated.temperature = 250 + (int)((dUT * sensor_coefficients.C6) / 65536)
-		                     - (int)(dUT / (1 << sensor_parameters.D));
+	if (multiplicationInRange(dUT, sensor_coefficients.C6)) {
+		calculated.temperature = 250 + (int)((dUT * sensor_coefficients.C6) / 65536)
+					     - (int)(dUT / (1 << sensor_parameters.D));
+	}
+	else {
+		calculated.temperature = 250 + (int)((dUT / 65536) * sensor_coefficients.C6)
+					     - (int)(dUT / (1 << sensor_parameters.D));
+	}
 
 	return HP03S_OK;
 }
 
+
+static HP03SBOOL multiplicationInRange(signed int si_a, signed int si_b)
+{
+	HP03SBOOL result = 1;
+	/* si_a is positive */
+	if (si_a > 0) {
+		/* si_a and si_b are positive */
+		if (si_b > 0) {
+			if (si_a > (INT_MAX / si_b)) {
+				result = 0;
+			}
+		} else { /* si_a positive, si_b nonpositive */
+			if (si_b < (INT_MIN / si_a)) {
+				result = 0;
+			}
+		} /* si_a positive, si_b nonpositive */
+	} else { /* si_a is nonpositive */
+		if (si_b > 0) { /* si_a is nonpositive, si_b is positive */
+			if (si_a < (INT_MIN / si_b)) {
+				result = 0;
+			}
+		} else { /* si_a and si_b are nonpositive */
+			if ( (si_a != 0) && (si_b < (INT_MAX / si_a))) {
+				result = 0;
+			}
+		} /* End if si_a and si_b are nonpositive */
+	} /* End if si_a is nonpositive */
+	return result;
+}

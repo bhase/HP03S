@@ -14,7 +14,7 @@
 typedef int Temperature;
 typedef int Pressure;
 
-typedef int64_t HP03S_Bigint;
+typedef int32_t HP03S_Bigint;
 
 typedef enum {
 	HP03S_OK = 0,
